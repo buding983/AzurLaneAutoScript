@@ -115,7 +115,7 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig):
     def load(self):
         self.data = self.read_file(self.config_name)
         ConfigTypeChecker.check(self.data)
-        self.config_override()
+        #self.config_override()
 
         for path, value in self.modified.items():
             deep_set(self.data, keys=path, value=value)
