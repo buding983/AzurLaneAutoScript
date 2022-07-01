@@ -1,5 +1,6 @@
 import numpy as np
 
+from module.base.decorator import Config
 from module.base.timer import Timer
 from module.base.utils import rgb2gray
 from module.combat.assets import GET_ITEMS_1, GET_ITEMS_2, GET_ITEMS_3
@@ -18,6 +19,7 @@ class RewardResearch(ResearchSelector):
     _research_project_offset = 0
     _research_finished_index = 2
     research_project_started = None  # ResearchProject
+    enforce = False
 
     def ensure_research_stable(self):
         self.wait_until_stable(STABLE_CHECKER)
@@ -66,9 +68,9 @@ class RewardResearch(ResearchSelector):
 
         logger.info('Research reset')
         executed = False
-        with self.stat.new(genre='research',
-                           save=self.config.DropRecord_SaveResearch,
-                           upload=self.config.DropRecord_UploadResearch) as record:
+        with self.stat.new(
+                genre='research', method=self.config.DropRecord_ResearchRecord
+        ) as record:
             record.add(self.device.image)
 
         while 1:
@@ -92,6 +94,21 @@ class RewardResearch(ResearchSelector):
         self._research_project_offset = 0
         return True
 
+    def research_enforce(self):
+        """
+        Returns:
+            bool: True if triggered enforce research
+        """
+        if (not self.enforce) \
+                and (self.config.Research_UseCube in ['only_no_project', 'only_05_hour']
+                     or self.config.Research_UseCoin in ['only_no_project', 'only_05_hour']
+                     or self.config.Research_UsePart in ['only_no_project', 'only_05_hour']):
+            logger.info('Enforce choosing research project')
+            self.enforce = True
+            self.research_select(self.research_sort_filter(self.enforce))
+            return True
+        return False
+
     def research_select(self, priority):
         """
         Args:
@@ -103,6 +120,7 @@ class RewardResearch(ResearchSelector):
         """
         if not len(priority):
             logger.info('No research project satisfies current filter')
+            self.research_enforce()
             return True
         for project in priority:
             # priority example: ['reset', 'shortest']
@@ -115,11 +133,13 @@ class RewardResearch(ResearchSelector):
             if isinstance(project, str):
                 # priority example: ['shortest']
                 if project == 'shortest':
-                    self.research_select(self.research_sort_shortest())
+                    self.research_select(self.research_sort_shortest(self.enforce))
                 elif project == 'cheapest':
-                    self.research_select(self.research_sort_cheapest())
+                    self.research_select(self.research_sort_cheapest(self.enforce))
                 else:
                     logger.warning(f'Unknown select method: {project}')
+                return True
+            elif project.genre.upper() in ['C', 'T'] and self.research_enforce():
                 return True
             else:
                 # priority example: [ResearchProject, ResearchProject,]
@@ -129,6 +149,7 @@ class RewardResearch(ResearchSelector):
                     continue
 
         logger.info('No research project started')
+        self.research_enforce()
         return True
 
     def research_project_start(self, project, skip_first_screenshot=True):
@@ -206,9 +227,9 @@ class RewardResearch(ResearchSelector):
                     return b
             return None
 
-        with self.stat.new(genre='research',
-                           save=self.config.DropRecord_SaveResearch,
-                           upload=self.config.DropRecord_UploadResearch) as record:
+        with self.stat.new(
+                genre='research', method=self.config.DropRecord_ResearchRecord
+                ) as record:
             # Take screenshots of project list
             record.add(self.device.image)
 
@@ -250,7 +271,8 @@ class RewardResearch(ResearchSelector):
                     self.device.sleep(1.5)
                     self.device.screenshot()
                     record.add(self.device.image)
-                    self.device.swipe_vector((0, 250), box=ITEMS_3_SWIPE.area, random_range=(-10, -10, 10, 10), padding=0)
+                    self.device.swipe_vector((0, 250), box=ITEMS_3_SWIPE.area, random_range=(-10, -10, 10, 10),
+                                             padding=0)
                     self.device.sleep(2)
                     self.device.screenshot()
                     record.add(self.device.image)
@@ -292,7 +314,7 @@ class RewardResearch(ResearchSelector):
 
         for _ in range(2):
             logger.hr('Research select', level=1)
-            self.research_detect(self.device.image)
+            self.research_detect()
             priority = self.research_sort_filter()
             result = self.research_select(priority)
             if result:
@@ -300,6 +322,38 @@ class RewardResearch(ResearchSelector):
 
         return True
 
+    @Config.when(SERVER='jp')
+    def research_get_remain(self):
+        """
+        Get remain duration of current project (the one in the middle).
+
+        Returns:
+            float: research project remain time if success
+            None: if failed
+
+        Pages:
+            in: page_research, stable.
+            out: page_research, stable.
+        """
+        ocr = Duration(DURATION_REMAIN, letter=(255, 255, 255), threshold=64, name='DURATION_REMAIN')
+
+        logger.hr('Research get remain')
+
+        self.interval_clear(MAIN_GOTO_CAMPAIGN)
+        self.ui_ensure_research()
+
+        remain = ocr.ocr(self.device.image)
+        logger.info(f'Research project remain: {remain}')
+
+        seconds = remain.total_seconds()
+        if seconds >= 0:
+            research_duration_remain = seconds / 3600
+            return research_duration_remain
+        else:
+            logger.warning(f'Invalid research duration: {seconds} ')
+            return None
+
+    @Config.when(SERVER=None)
     def research_get_remain(self):
         """
         Get remain duration of current project from page_reward.
@@ -361,7 +415,7 @@ class RewardResearch(ResearchSelector):
             research_duration_remain = self.research_get_remain()
             if research_duration_remain == 0:
                 # Reseach finished or project requirements not satisfied (B/E/T)
-                # Need to check in page_research 
+                # Need to check in page_research
                 self.interval_clear(MAIN_GOTO_CAMPAIGN)
                 self.ui_ensure_research()
                 if self.research_has_finished():

@@ -1,15 +1,17 @@
 import re
 from datetime import datetime
 
+import module.config.server as server
 from module.base.button import Button, ButtonGrid
 from module.base.filter import Filter
 from module.base.timer import Timer
 from module.base.utils import *
 from module.exception import ScriptError
+from module.handler.assets import GET_MISSION, POPUP_CANCEL, POPUP_CONFIRM
 from module.logger import logger
 from module.map.map_grids import SelectedGrids
 from module.ocr.ocr import DigitCounter, Duration
-from module.handler.assets import GET_MISSION, POPUP_CANCEL, POPUP_CONFIRM
+from module.retire.assets import DOCK_CHECK
 from module.tactical.assets import *
 from module.ui.assets import (BACK_ARROW, REWARD_CHECK, REWARD_GOTO_TACTICAL,
                               TACTICAL_CHECK)
@@ -18,21 +20,33 @@ from module.ui.ui import UI, page_reward
 
 class SkillExp(DigitCounter):
     def pre_process(self, image):
-        # Image is like `NEXT:1900/5800`, 1900 is green and others are in white
+        # Image is like `NEXT:1900+500/5800`, 500 is green and others are in white
+
+        # Find green letters
+        hsv = rgb2hsv(image)
+        h = (60, 180)
+        s = (50, 100)
+        v = (50, 100)
+        lower = (h[0], s[0], v[0])
+        upper = (h[1], s[1], v[1])
+        green = np.mean(cv2.inRange(hsv, lower, upper), axis=0)
         # Convert to gray scale
         r, g, b = cv2.split(image)
         image = cv2.max(cv2.max(r, g), b)
+        # Paint `+500` to white
+        matched = np.where(green > 0.5)[0]
+        if len(matched):
+            image[:, matched[0] - 8:matched[-1] + 2] = 0
 
-        try:
-            # Get the start pixel of letter `N` and shift to the end of `:`
-            starter = np.where(np.mean(image, axis=0) > 150)[0][0] + 42
-        except IndexError:
-            logger.warning('Unable to strip SKILL_EXP, skip')
-            starter = 0
-        # Crop `1900/5800`
-        image = image[:, starter:]
+        image = 255 - image
 
-        return 255 - image
+        # Strip `Next:`
+        if server.server == 'en':
+            # Bold `Next:`
+            image = image_left_strip(image, threshold=105, length=46)
+        else:
+            image = image_left_strip(image, threshold=105, length=42)
+        return image
 
 
 SKILL_EXP = SkillExp(buttons=OCR_SKILL_EXP)
@@ -208,25 +222,6 @@ class RewardTacticalClass(UI):
         # Max level in progress; so selective books
         # should be removed to prevent waste
         if total == 5800:
-            if current == 0:
-                # Lvl 9+1, using first will reach max level
-                # Swap to last and re-OCR
-                self._tactical_book_select(last)
-                current, remain, total = SKILL_EXP.ocr(self.device.image)
-                if current == 0:
-                    # Still Lvl 9+1 even with last
-                    # Must re-calculate to accurately gauge
-                    current = total - last.exp_value
-                    remain = last.exp_value
-                else:
-                    # Lvl 9, so can calculate normally
-                    # but use last
-                    current -= last.exp_value
-                    remain += last.exp_value
-            else:
-                # Lvl 9, so can calculate normally
-                current -= first.exp_value
-                remain += first.exp_value
             logger.info('About to reach level 10; will remove '
                         'detected books based on actual '
                        f'progress: {current}/{total}; {remain}')
@@ -362,9 +357,9 @@ class RewardTacticalClass(UI):
                 empty_confirm.reset()
 
             # Popups
-            if self.appear_then_click(REWARD_2, offset=(20, 20), interval=1):
+            if self.appear_then_click(REWARD_2, offset=(20, 20), interval=3):
                 continue
-            if self.appear_then_click(REWARD_GOTO_TACTICAL, offset=(20, 20), interval=1):
+            if self.appear_then_click(REWARD_GOTO_TACTICAL, offset=(20, 20), interval=3):
                 continue
             if self.handle_popup_confirm('TACTICAL'):
                 continue
@@ -378,6 +373,14 @@ class RewardTacticalClass(UI):
                 if self._tactical_books_choose():
                     self.interval_reset(TACTICAL_CLASS_CANCEL)
                     self.interval_clear([POPUP_CONFIRM, POPUP_CANCEL, GET_MISSION])
+                continue
+            if self.appear(DOCK_CHECK, offset=(20, 20), interval=3):
+                # Entered dock accidentally
+                self.device.click(BACK_ARROW)
+                continue
+            if self.appear(SKILL_CONFIRM, offset=(20, 20), interval=3):
+                # Game auto pops up the next skill to learn, close it
+                self.device.click(BACK_ARROW)
                 continue
 
         return True
@@ -397,7 +400,3 @@ class RewardTacticalClass(UI):
         else:
             logger.info('No tactical running')
             self.config.task_delay(success=False)
-if __name__ == '__main__':
-    self = RewardTacticalClass('alas-tech')
-    self.device.screenshot()
-    self.tactical_class_receive()

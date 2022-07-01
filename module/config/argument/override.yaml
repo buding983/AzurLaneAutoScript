@@ -104,6 +104,12 @@ Raid:
     StageIncrease: false
     GetNewShip: false
     ReachLevel: 0
+  Emotion:
+    Fleet2Value: 119
+    Fleet2Record: 2020-01-01 00:00:00
+    Fleet2Control: prevent_yellow_face
+    Fleet2Recover: not_in_dormitory
+    Fleet2Oath: false
 RaidDaily:
   Scheduler:
     SuccessInterval: 30
@@ -123,6 +129,12 @@ RaidDaily:
     StageIncrease: false
     GetNewShip: false
     ReachLevel: 0
+  Emotion:
+    Fleet2Value: 119
+    Fleet2Record: 2020-01-01 00:00:00
+    Fleet2Control: prevent_yellow_face
+    Fleet2Recover: not_in_dormitory
+    Fleet2Oath: false
 MaritimeEscort:
   Scheduler:
     SuccessInterval: 30
@@ -133,18 +145,24 @@ MaritimeEscort:
 
 Commission:
   Scheduler:
-    SuccessInterval: 30
-    FailureInterval: 30
+    Enable:
+      value: true
+      type: lock
+    SuccessInterval: 30-60
+    FailureInterval: 30-60
     ServerUpdate: 00:00
 Tactical:
   Scheduler:
-    SuccessInterval: 30
-    FailureInterval: 30
+    SuccessInterval: 30-60
+    FailureInterval: 120-240
     ServerUpdate: 00:00
 Research:
   Scheduler:
-    SuccessInterval: 30
-    FailureInterval: 30
+    Enable:
+      value: true
+      type: lock
+    SuccessInterval: 30-60
+    FailureInterval: 30-60
     ServerUpdate: 00:00
 Dorm:
   Scheduler:
@@ -163,8 +181,11 @@ Guild:
     ServerUpdate: 00:00, 06:00, 12:00, 18:00, 21:00
 Reward:
   Scheduler:
-    SuccessInterval: 60-120
-    FailureInterval: 60-120
+    Enable:
+      value: true
+      type: lock
+    SuccessInterval: 120-240
+    FailureInterval: 120-240
     ServerUpdate: 00:00
 ShopFrequent:
   Scheduler:

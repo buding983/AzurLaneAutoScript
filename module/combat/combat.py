@@ -1,11 +1,9 @@
 import numpy as np
 
-from module.base.decorator import cached_property
 from module.base.timer import Timer
 from module.combat.assets import *
 from module.combat.combat_auto import CombatAuto
 from module.combat.combat_manual import CombatManual
-from module.combat.emotion import Emotion
 from module.combat.hp_balancer import HPBalancer
 from module.combat.level import Level
 from module.combat.submarine import SubmarineCall
@@ -21,11 +19,6 @@ from module.ui.assets import BACK_ARROW
 class Combat(Level, HPBalancer, Retirement, SubmarineCall, CombatAuto, CombatManual, AutoSearchHandler):
     _automation_set_timer = Timer(1)
     battle_status_click_interval = 0
-    emotion: Emotion
-
-    @cached_property
-    def emotion(self):
-        return Emotion(config=self.config)
 
     def combat_appear(self):
         """
@@ -230,6 +223,7 @@ class Combat(Level, HPBalancer, Retirement, SubmarineCall, CombatAuto, CombatMan
         self.submarine_call_reset()
         self.combat_auto_reset()
         self.combat_manual_reset()
+        self.device.click_record_clear()
         confirm_timer = Timer(10)
         confirm_timer.start()
 
@@ -475,7 +469,7 @@ class Combat(Level, HPBalancer, Retirement, SubmarineCall, CombatAuto, CombatMan
         #     self.emotion = Emotion(config=self.config)
 
         with self.stat.new(
-                genre=self.config.campaign_name, save=self.config.DropRecord_SaveCombat, upload=False
+                genre=self.config.campaign_name, method=self.config.DropRecord_CombatRecord
         ) as drop:
             if save_get_items is False:
                 drop = None

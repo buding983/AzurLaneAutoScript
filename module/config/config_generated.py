@@ -19,10 +19,11 @@ class GeneratedConfig:
 
     # Group `Emulator`
     Emulator_Serial = 'auto'
-    Emulator_PackageName = 'auto'  # auto, com.bilibili.azurlane, com.YoStarEN.AzurLane, com.YoStarJP.AzurLane, com.hkmanjuu.azurlane.gp, com.bilibili.blhx.huawei, com.bilibili.blhx.mi, com.tencent.tmgp.bilibili.blhx, com.bilibili.blhx.baidu, com.bilibili.blhx.qihoo, com.bilibili.blhx.oppo, com.bilibili.blhx.vivo, com.bilibili.blhx.uc, com.bilibili.blhx.mzw, com.yiwu.blhx.yx15, com.hkmanjuu.azurlane.gp.mc
+    Emulator_PackageName = 'auto'  # auto, com.bilibili.azurlane, com.YoStarEN.AzurLane, com.YoStarJP.AzurLane, com.hkmanjuu.azurlane.gp, com.bilibili.blhx.huawei, com.bilibili.blhx.mi, com.tencent.tmgp.bilibili.blhx, com.bilibili.blhx.baidu, com.bilibili.blhx.qihoo, com.bilibili.blhx.oppo, com.bilibili.blhx.vivo, com.bilibili.blhx.mz, com.bilibili.blhx.uc, com.bilibili.blhx.mzw, com.yiwu.blhx.yx15, com.hkmanjuu.azurlane.gp.mc
     Emulator_ScreenshotMethod = 'ADB'  # ADB, ADB_nc, uiautomator2, aScreenCap, aScreenCap_nc
     Emulator_ControlMethod = 'minitouch'  # ADB, uiautomator2, minitouch, Hermit
     Emulator_ScreenshotDedithering = False
+    Emulator_AdbRestart = False
 
     # Group `Error`
     Error_HandleError = True
@@ -38,14 +39,13 @@ class GeneratedConfig:
     # Group `DropRecord`
     DropRecord_SaveFolder = './screenshots'
     DropRecord_AzurStatsID = None
-    DropRecord_SaveResearch = False
-    DropRecord_UploadResearch = False
-    DropRecord_SaveCommission = False
-    DropRecord_UploadCommission = False
-    DropRecord_SaveCombat = False
-    DropRecord_SaveOpsi = False
-    DropRecord_UploadOpsi = False
-    DropRecord_SaveMeowfficer = False
+    DropRecord_API = 'default'  # default, cn_gz_reverse_proxy, cn_sh_reverse_proxy
+    DropRecord_ResearchRecord = 'do_not'  # do_not, save, upload, save_and_upload
+    DropRecord_CommissionRecord = 'do_not'  # do_not, save, upload, save_and_upload
+    DropRecord_CombatRecord = 'do_not'  # do_not, save
+    DropRecord_OpsiRecord = 'do_not'  # do_not, save, upload, save_and_upload
+    DropRecord_MeowfficerBuy = 'do_not'  # do_not, save
+    DropRecord_MeowfficerTalent = 'do_not'  # do_not, save, upload, save_and_upload
 
     # Group `Retirement`
     Retirement_Enable = True
@@ -180,10 +180,10 @@ class GeneratedConfig:
     ControlExpOverflow_T1Allow = 200
 
     # Group `Research`
-    Research_UseCube = 'only_05_hour'  # always_use, only_05_hour, do_not_use
-    Research_UseCoin = 'always_use'  # always_use, only_05_hour, do_not_use
-    Research_UsePart = 'always_use'  # always_use, only_05_hour, do_not_use
-    Research_PresetFilter = 'series_4_blueprint_tenrai'  # custom, series_4_blueprint_tenrai, series_4_blueprint_only, series_4_tenrai_only, series_3, series_3_than_2
+    Research_UseCube = 'only_05_hour'  # always_use, only_05_hour, only_no_project, do_not_use
+    Research_UseCoin = 'always_use'  # always_use, only_05_hour, only_no_project, do_not_use
+    Research_UsePart = 'always_use'  # always_use, only_05_hour, only_no_project, do_not_use
+    Research_PresetFilter = 'series_4_blueprint_tenrai'  # custom, series_4_blueprint_tenrai, series_4_blueprint_only, series_4_tenrai_only, series_3_blueprint_234, series_3_blueprint_only, series_3_234_only, series_2_than_3_457_234, series_2_blueprint_457, series_2_blueprint_only, series_2_457_only
     Research_CustomFilter = 'S4-Q0.5 > Q-0.5 > S4-DR0.5 > S4-PRY0.5 > DR-0.5 > PRY-0.5\n> S4-Q1 > S4-Q2\n> S4-DR2.5 > S4-G1.5\n> S4-Q4 > S4-H0.5 > S4-G4\n> S4-PRY2.5 > S4-G2.5\n> reset > S4-H1 > shortest'
 
     # Group `Dorm`
@@ -244,8 +244,14 @@ class GeneratedConfig:
     GuildShop_PR2 = 'seattle'  # seattle, georgia, kitakaze, gascogne
     GuildShop_PR3 = 'cheshire'  # cheshire, mainz, odin, champagne
 
-    # Group `MedalShop`
-    MedalShop_Filter = 'DR > PR\n> BookRedT3 > BookYellowT3 > BookBlueT3 > BookRedT2 > BookYellowT2 > BookBlueT2\n> RetrofitT3 > PlateGeneralT3\n> FoodT6 > FoodT5'
+    # Group `MedalShop2`
+    MedalShop2_Filter = 'DR > PR\n> BookRedT3 > BookYellowT3 > BookBlueT3\n> BookRedT2 > BookYellowT2 > BookBlueT2\n> RetrofitT3\n> FoodT6 > FoodT5\n> PlateGeneralT3 > PlateWildT3'
+    MedalShop2_RETROFIT_T1 = 'cl'  # dd, cl, bb, cv
+    MedalShop2_RETROFIT_T2 = 'cl'  # dd, cl, bb, cv
+    MedalShop2_RETROFIT_T3 = 'cl'  # dd, cl, bb, cv
+    MedalShop2_PLATE_T1 = 'general'  # general, gun, torpedo, antiair, plane
+    MedalShop2_PLATE_T2 = 'general'  # general, gun, torpedo, antiair, plane
+    MedalShop2_PLATE_T3 = 'general'  # general, gun, torpedo, antiair, plane
 
     # Group `MeritShop`
     MeritShop_Refresh = False
@@ -284,6 +290,8 @@ class GeneratedConfig:
     Daily_TacticalTraining = 'second'  # skip, first, second, third
     Daily_TacticalTrainingFleet = 5  # 1, 2, 3, 4, 5, 6
     Daily_SupplyLineDisruption = 'second'  # skip, first, second, third
+    Daily_ModuleDevelopment = 'first'  # skip, first, second
+    Daily_ModuleDevelopmentFleet = 5  # 1, 2, 3, 4, 5, 6
 
     # Group `Hard`
     Hard_HardStage = '11-4'
@@ -309,7 +317,7 @@ class GeneratedConfig:
     OpsiGeneral_BuyActionPoint = False
     OpsiGeneral_OilLimit = 1000
     OpsiGeneral_RepairThreshold = 0.4
-    OpsiGeneral_BuyAkashiShop = True
+    OpsiGeneral_DoRandomMapEvent = True
     OpsiGeneral_AkashiShopFilter = 'ActionPoint > PurpleCoins'
 
     # Group `OpsiAshBeacon`
@@ -355,6 +363,7 @@ class GeneratedConfig:
 
     # Group `OpsiDaemon`
     OpsiDaemon_RepairShip = True
+    OpsiDaemon_SelectEnemy = True
 
     # Group `Benchmark`
     Benchmark_AdbScreenshot = True

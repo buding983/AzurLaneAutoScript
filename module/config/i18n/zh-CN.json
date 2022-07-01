@@ -246,7 +246,7 @@
     },
     "Enable": {
       "name": "启用该功能",
-      "help": "将这个任务加入调度器"
+      "help": "将这个任务加入调度器\n委托、科研、收获任务是强制打开的"
     },
     "NextRun": {
       "name": "下一次运行时间",
@@ -293,6 +293,7 @@
       "com.bilibili.blhx.qihoo": "国服 360渠道服 com.bilibili.blhx.qihoo",
       "com.bilibili.blhx.oppo": "国服 oppo渠道服 com.bilibili.blhx.oppo",
       "com.bilibili.blhx.vivo": "国服 vivo渠道服 com.bilibili.blhx.vivo",
+      "com.bilibili.blhx.mz": "国服 魅族渠道服 com.bilibili.blhx.mz",
       "com.bilibili.blhx.uc": "国服 UC九游渠道服 com.bilibili.blhx.uc",
       "com.bilibili.blhx.mzw": "国服 拇指玩渠道服 com.bilibili.blhx.mzw",
       "com.yiwu.blhx.yx15": "国服 一五游戏渠道服 com.yiwu.blhx.yx15",
@@ -318,6 +319,10 @@
     "ScreenshotDedithering": {
       "name": "去除图片色彩抖动",
       "help": "在手机上运行时开启"
+    },
+    "AdbRestart": {
+      "name": "在检测不到设备的时候尝试重启adb",
+      "help": ""
     }
   },
   "Error": {
@@ -376,37 +381,56 @@
       "name": "AzurStat ID",
       "help": "上传至 https://azur-stats.lyoko.io 时，声明的客户端 ID\n由随机字符组成，可随意修改"
     },
-    "SaveResearch": {
-      "name": "保存科研截图",
-      "help": ""
+    "API": {
+      "name": "上传线路",
+      "help": "如果国内用户无法连接到 AzurStat，可以使用\"国内反向代理\"",
+      "default": "默认 (Cloudflare)",
+      "cn_gz_reverse_proxy": "国内反向代理 (广州)",
+      "cn_sh_reverse_proxy": "国内反向代理 (上海)"
     },
-    "UploadResearch": {
-      "name": "上传科研截图",
-      "help": ""
+    "ResearchRecord": {
+      "name": "科研截图",
+      "help": "",
+      "do_not": "无操作",
+      "save": "保存",
+      "upload": "上传",
+      "save_and_upload": "保存并上传"
     },
-    "SaveCommission": {
-      "name": "保存委托截图",
-      "help": ""
+    "CommissionRecord": {
+      "name": "委托截图",
+      "help": "",
+      "do_not": "无操作",
+      "save": "保存",
+      "upload": "上传",
+      "save_and_upload": "保存并上传"
     },
-    "UploadCommission": {
-      "name": "上传委托截图",
-      "help": ""
+    "CombatRecord": {
+      "name": "战斗掉落截图",
+      "help": "启用后会放缓结算时的点击速度\n在自律寻敌下不生效",
+      "do_not": "无操作",
+      "save": "保存"
     },
-    "SaveCombat": {
-      "name": "保存战斗掉落截图",
-      "help": "启用后会放缓结算时的点击速度\n在自律寻敌下不生效"
+    "OpsiRecord": {
+      "name": "大世界掉落截图",
+      "help": "",
+      "do_not": "无操作",
+      "save": "保存",
+      "upload": "上传",
+      "save_and_upload": "保存并上传"
     },
-    "SaveOpsi": {
-      "name": "保存大世界掉落截图",
-      "help": ""
+    "MeowfficerBuy": {
+      "name": "指挥喵购买截图",
+      "help": "",
+      "do_not": "无操作",
+      "save": "保存"
     },
-    "UploadOpsi": {
-      "name": "上传大世界掉落截图",
-      "help": ""
-    },
-    "SaveMeowfficer": {
-      "name": "保存指挥喵购买截图",
-      "help": ""
+    "MeowfficerTalent": {
+      "name": "指挥喵天赋截图",
+      "help": "",
+      "do_not": "无操作",
+      "save": "保存",
+      "upload": "上传",
+      "save_and_upload": "保存并上传"
     }
   },
   "Retirement": {
@@ -441,7 +465,7 @@
     },
     "EnhanceCheckPerCategory": {
       "name": "每分类强化数量",
-      "help": "每个舰船分类最多强化多少舰船，\n在战斗中的舰船会被跳过且不计入"
+      "help": "每个舰船分类最多强化多少舰船，\n在战斗中的舰船会被跳过且不计入，\n优先判断是否有强化材料"
     },
     "OldRetireN": {
       "name": "退役白皮 ( N )",
@@ -473,6 +497,13 @@
       "name": "活动名称",
       "help": "自动选择至最新的活动",
       "campaign_main": "主线图",
+      "raid_20220630": "来自鸢尾的天使",
+      "raid_20210708": "复刻穿越彼方的水线",
+      "event_20200820_cn": "复刻铁血音符誓言",
+      "event_20201012_cn": "复刻划破海空之翼",
+      "event_20210527_cn": "镜位螺旋",
+      "event_20220526_cn": "泠誓光庭",
+      "raid_20200624": "复刻特别演习埃塞克斯级",
       "event_20220428_cn": "虹彩的终幕曲",
       "event_20220414_cn": "复刻永夜幻光",
       "event_20220407_tw": "蒼紅的迴響(復刻)",
@@ -490,8 +521,6 @@
       "event_20211111_cn": "杰诺瓦的焰火",
       "event_20211028_tw": "復刻光與影的鳶尾之華",
       "event_20211028_cn": "复刻穹顶下的圣咏曲",
-      "raid_20210708": "复刻穿越彼方的水线",
-      "event_20201012_cn": "划破海空之翼",
       "event_20200917_cn": "蝶海梦花",
       "event_20210916_cn": "碧海光粼",
       "event_20210722_cn": "响彻碧海的偶像歌",
@@ -502,7 +531,6 @@
       "event_20210624_cn": "复刻浮樱影华",
       "event_20210624_tw": "穹頂下的聖詠曲",
       "event_20210610_tw": "夜幕下的歸途",
-      "event_20210527_cn": "镜位螺旋",
       "event_20210527_tw": "微層混合",
       "event_20210429_tw": "復刻墨染的鋼鐵之花",
       "event_20210415_tw": "復刻圍剿施佩伯爵",
@@ -513,9 +541,7 @@
       "event_20200312_cn": "复刻斯图尔特的硝烟",
       "event_20201029_cn": "激唱的UNIVERSE",
       "event_20201002_en": "Counterattack Within the Fjord",
-      "event_20200820_cn": "复刻铁血音符誓言",
       "event_20200716_en": "Ink Stained Steel Sakura Rerun",
-      "raid_20200624": "复刻特别演习埃塞克斯级",
       "event_20200611_en": "Skybound Oratorio",
       "event_20200603_en": "Prelude under the Moon Rerun",
       "event_20200521_en": "Iris of Light and Dark Rerun",
@@ -1070,21 +1096,24 @@
       "name": "使用魔方",
       "help": "",
       "always_use": "总是使用",
-      "only_05_hour": "仅0.5小时科研使用",
+      "only_05_hour": "0.5小时+无项目可做时",
+      "only_no_project": "无项目可做时",
       "do_not_use": "不使用"
     },
     "UseCoin": {
       "name": "使用物资",
       "help": "",
       "always_use": "总是使用",
-      "only_05_hour": "仅0.5小时科研使用",
+      "only_05_hour": "0.5小时+无项目可做时",
+      "only_no_project": "无项目可做时",
       "do_not_use": "不使用"
     },
     "UsePart": {
       "name": "使用部件",
       "help": "",
       "always_use": "总是使用",
-      "only_05_hour": "仅0.5小时科研使用",
+      "only_05_hour": "0.5小时+无项目可做时",
+      "only_no_project": "无项目可做时",
       "do_not_use": "不使用"
     },
     "PresetFilter": {
@@ -1094,8 +1123,13 @@
       "series_4_blueprint_tenrai": "四期 蓝图+天雷",
       "series_4_blueprint_only": "四期 仅蓝图",
       "series_4_tenrai_only": "四期 仅天雷",
-      "series_3": "三期",
-      "series_3_than_2": "三期兼顾二期"
+      "series_3_blueprint_234": "三期 蓝图+234",
+      "series_3_blueprint_only": "三期 仅蓝图",
+      "series_3_234_only": "三期 仅234",
+      "series_2_than_3_457_234": "二期兼顾三期 457+234",
+      "series_2_blueprint_457": "二期 蓝图+457",
+      "series_2_blueprint_only": "二期 仅蓝图",
+      "series_2_457_only": "二期 仅457"
     },
     "CustomFilter": {
       "name": "自定义科研过滤器",
@@ -1371,14 +1405,65 @@
       "champagne": "香槟"
     }
   },
-  "MedalShop": {
+  "MedalShop2": {
     "_info": {
-      "name": "兑换商店（退役兑换）",
+      "name": "功勋商店（退役兑换）",
       "help": ""
     },
     "Filter": {
       "name": "商店过滤器",
       "help": ""
+    },
+    "RETROFIT_T1": {
+      "name": "蓝色改造图纸选择",
+      "help": "",
+      "dd": "驱逐",
+      "cl": "巡洋",
+      "bb": "战列",
+      "cv": "航母"
+    },
+    "RETROFIT_T2": {
+      "name": "紫色改造图纸选择",
+      "help": "",
+      "dd": "驱逐",
+      "cl": "巡洋",
+      "bb": "战列",
+      "cv": "航母"
+    },
+    "RETROFIT_T3": {
+      "name": "金色改造图纸选择",
+      "help": "",
+      "dd": "驱逐",
+      "cl": "巡洋",
+      "bb": "战列",
+      "cv": "航母"
+    },
+    "PLATE_T1": {
+      "name": "白色部件选择",
+      "help": "",
+      "general": "通用",
+      "gun": "主炮",
+      "torpedo": "鱼雷",
+      "antiair": "防空",
+      "plane": "舰载机"
+    },
+    "PLATE_T2": {
+      "name": "蓝色部件选择",
+      "help": "",
+      "general": "通用",
+      "gun": "主炮",
+      "torpedo": "鱼雷",
+      "antiair": "防空",
+      "plane": "舰载机"
+    },
+    "PLATE_T3": {
+      "name": "紫色部件选择",
+      "help": "",
+      "general": "通用",
+      "gun": "主炮",
+      "torpedo": "鱼雷",
+      "antiair": "防空",
+      "plane": "舰载机"
     }
   },
   "MeritShop": {
@@ -1574,6 +1659,23 @@
       "first": "第一个",
       "second": "第二个",
       "third": "第三个"
+    },
+    "ModuleDevelopment": {
+      "name": "兵装训练（兵装本）",
+      "help": "",
+      "skip": "不打",
+      "first": "第一个",
+      "second": "第二个"
+    },
+    "ModuleDevelopmentFleet": {
+      "name": "兵装训练出击舰队",
+      "help": "",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6"
     }
   },
   "Hard": {
@@ -1679,9 +1781,9 @@
       "name": "任意舰船血量低于 X 后，回港修理",
       "help": "0.0 ~ 1.0"
     },
-    "BuyAkashiShop": {
-      "name": "买明石商店",
-      "help": ""
+    "DoRandomMapEvent": {
+      "name": "完成地图随机事件",
+      "help": "在自律寻敌完成后重新扫描一遍地图，购买明石商店，使用塞壬信息收集装置、使用塞壬探测装置、解锁两舰队机关"
     },
     "AkashiShopFilter": {
       "name": "商店过滤器",
@@ -1847,6 +1949,10 @@
     "RepairShip": {
       "name": "靠近港口时自动修船",
       "help": "手动把队伍移动至港口后，Alas将帮助修船\n修理完成后需要在30秒内将队伍移出港口，否则将再次修船"
+    },
+    "SelectEnemy": {
+      "name": "清理附近的敌人和物资",
+      "help": "清理附近的敌人和物资，清理完后又会找到新的敌人或物资，这样通常能清理整个海域，如果有遗漏或者点击错误，需要手动解决"
     }
   },
   "Benchmark": {
@@ -1970,11 +2076,11 @@
     "Update": {
       "UpToDate": "已是最新版本",
       "HaveUpdate": "有新版本可用",
-      "UpdateFailed": "更新失败，可在./log/*_gui.txt中找到错误日志",
       "UpdateStart": "开始更新",
       "UpdateWait": "等待所有 Alas 完成当前任务",
       "UpdateRun": "更新中",
       "UpdateSuccess": "更新成功，正在重启",
+      "UpdateFailed": "更新失败，可在./log/*_gui.txt中找到错误日志",
       "UpdateChecking": "检查更新中",
       "UpdateCancel": "取消更新，重启 Alas 中",
       "UpdateFinish": "更新成功，请手动重启",
@@ -1983,7 +2089,8 @@
       "Author": "作者",
       "Time": "提交时间",
       "Message": "提交信息",
-      "DisabledWarn": "更新模块未启用，你需要手动重启 Alas 进行更新"
+      "DisabledWarn": "更新模块未启用，你需要手动重启 Alas 进行更新",
+      "DetailedHistory": "详细提交历史"
     },
     "Text": {
       "InvalidFeedBack": "格式错误。 示例：{0}"

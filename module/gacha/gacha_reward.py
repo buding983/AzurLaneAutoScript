@@ -18,13 +18,13 @@ OCR_BUILD_SUBMIT_WW_COUNT = Digit(BUILD_SUBMIT_WW_COUNT, letter=(255, 247, 247),
 class RewardGacha(GachaUI, GeneralShop, Retirement):
     build_cube_count = 0
 
-    def gacha_prep(self, target, skip_first_scrrenshot=True):
+    def gacha_prep(self, target, skip_first_screenshot=True):
         """
         Initiate preparation to submit build orders.
 
         Args:
             target (int): Number of build orders to submit
-            skip_first_scrrenshot (bool):
+            skip_first_screenshot (bool):
 
         Returns:
             bool: True if prep complete otherwise False.
@@ -51,8 +51,8 @@ class RewardGacha(GachaUI, GeneralShop, Retirement):
         ocr_submit = None
         index_offset = (60, 20)
         while 1:
-            if skip_first_scrrenshot:
-                skip_first_scrrenshot = False
+            if skip_first_screenshot:
+                skip_first_screenshot = False
             else:
                 self.device.screenshot()
 
@@ -108,7 +108,7 @@ class RewardGacha(GachaUI, GeneralShop, Retirement):
                 break
 
             # Insufficient resources, reduce by 1 and re-calculate
-            if gold_total > self._shop_gold_coins or cube_total > self.build_cube_count:
+            if gold_total > self._currency or cube_total > self.build_cube_count:
                 target_count -= 1
                 continue
 
@@ -116,7 +116,7 @@ class RewardGacha(GachaUI, GeneralShop, Retirement):
 
         # Modify resources, return current 'target_count'
         logger.info(f'Able to submit up to {target_count} build orders')
-        self._shop_gold_coins -= gold_total
+        self._currency -= gold_total
         self.build_cube_count -= cube_total
         return target_count
 
@@ -229,7 +229,7 @@ class RewardGacha(GachaUI, GeneralShop, Retirement):
                 continue
 
             # End, goes back to pool page if clicked with queue empty
-            if self.appear(BUILD_SUBMIT_ORDERS):
+            if self.appear(BUILD_SUBMIT_ORDERS) or self.appear(BUILD_SUBMIT_WW_ORDERS):
                 if confirm_timer.reached():
                     break
 

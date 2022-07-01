@@ -379,6 +379,8 @@ class RewardCommission(UI, InfoHandler):
 
             if failed:
                 logger.warning(f'Failed to select commission: {comm}')
+                self._commission_mode_reset()
+                self._commission_swipe_to_top()
                 self.device.click_record_clear()
                 continue
             else:
@@ -436,9 +438,9 @@ class RewardCommission(UI, InfoHandler):
 
         reward = False
         click_timer = Timer(1)
-        with self.stat.new('commission',
-                           save=self.config.DropRecord_SaveCommission,
-                           upload=self.config.DropRecord_UploadCommission) as drop:
+        with self.stat.new(
+                'commission', method=self.config.DropRecord_CommissionRecord
+        ) as drop:
             while 1:
                 if skip_first_screenshot:
                     skip_first_screenshot = False

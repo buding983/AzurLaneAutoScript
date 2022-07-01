@@ -293,6 +293,7 @@
       "com.bilibili.blhx.qihoo": "CN com.bilibili.blhx.qihoo",
       "com.bilibili.blhx.oppo": "CN com.bilibili.blhx.oppo",
       "com.bilibili.blhx.vivo": "CN com.bilibili.blhx.vivo",
+      "com.bilibili.blhx.mz": "CN com.bilibili.blhx.mz",
       "com.bilibili.blhx.uc": "CN com.bilibili.blhx.uc",
       "com.bilibili.blhx.mzw": "CN com.bilibili.blhx.mzw",
       "com.yiwu.blhx.yx15": "CN com.yiwu.blhx.yx15",
@@ -318,6 +319,10 @@
     "ScreenshotDedithering": {
       "name": "Emulator.ScreenshotDedithering.name",
       "help": "Emulator.ScreenshotDedithering.help"
+    },
+    "AdbRestart": {
+      "name": "Emulator.AdbRestart.name",
+      "help": "Emulator.AdbRestart.help"
     }
   },
   "Error": {
@@ -376,37 +381,56 @@
       "name": "DropRecord.AzurStatsID.name",
       "help": "DropRecord.AzurStatsID.help"
     },
-    "SaveResearch": {
-      "name": "DropRecord.SaveResearch.name",
-      "help": "DropRecord.SaveResearch.help"
+    "API": {
+      "name": "DropRecord.API.name",
+      "help": "DropRecord.API.help",
+      "default": "default",
+      "cn_gz_reverse_proxy": "cn_gz_reverse_proxy",
+      "cn_sh_reverse_proxy": "cn_sh_reverse_proxy"
     },
-    "UploadResearch": {
-      "name": "DropRecord.UploadResearch.name",
-      "help": "DropRecord.UploadResearch.help"
+    "ResearchRecord": {
+      "name": "DropRecord.ResearchRecord.name",
+      "help": "DropRecord.ResearchRecord.help",
+      "do_not": "do_not",
+      "save": "save",
+      "upload": "upload",
+      "save_and_upload": "save_and_upload"
     },
-    "SaveCommission": {
-      "name": "DropRecord.SaveCommission.name",
-      "help": "DropRecord.SaveCommission.help"
+    "CommissionRecord": {
+      "name": "DropRecord.CommissionRecord.name",
+      "help": "DropRecord.CommissionRecord.help",
+      "do_not": "do_not",
+      "save": "save",
+      "upload": "upload",
+      "save_and_upload": "save_and_upload"
     },
-    "UploadCommission": {
-      "name": "DropRecord.UploadCommission.name",
-      "help": "DropRecord.UploadCommission.help"
+    "CombatRecord": {
+      "name": "DropRecord.CombatRecord.name",
+      "help": "DropRecord.CombatRecord.help",
+      "do_not": "do_not",
+      "save": "save"
     },
-    "SaveCombat": {
-      "name": "DropRecord.SaveCombat.name",
-      "help": "DropRecord.SaveCombat.help"
+    "OpsiRecord": {
+      "name": "DropRecord.OpsiRecord.name",
+      "help": "DropRecord.OpsiRecord.help",
+      "do_not": "do_not",
+      "save": "save",
+      "upload": "upload",
+      "save_and_upload": "save_and_upload"
     },
-    "SaveOpsi": {
-      "name": "DropRecord.SaveOpsi.name",
-      "help": "DropRecord.SaveOpsi.help"
+    "MeowfficerBuy": {
+      "name": "DropRecord.MeowfficerBuy.name",
+      "help": "DropRecord.MeowfficerBuy.help",
+      "do_not": "do_not",
+      "save": "save"
     },
-    "UploadOpsi": {
-      "name": "DropRecord.UploadOpsi.name",
-      "help": "DropRecord.UploadOpsi.help"
-    },
-    "SaveMeowfficer": {
-      "name": "DropRecord.SaveMeowfficer.name",
-      "help": "DropRecord.SaveMeowfficer.help"
+    "MeowfficerTalent": {
+      "name": "DropRecord.MeowfficerTalent.name",
+      "help": "DropRecord.MeowfficerTalent.help",
+      "do_not": "do_not",
+      "save": "save",
+      "upload": "upload",
+      "save_and_upload": "save_and_upload"
     }
   },
   "Retirement": {
@@ -473,6 +497,13 @@
       "name": "Campaign.Event.name",
       "help": "Campaign.Event.help",
       "campaign_main": "campaign_main",
+      "raid_20220630": "アイリスの天使",
+      "raid_20210708": "交錯する新たな波 (復刻)",
+      "event_20200820_cn": "黒鉄の楽章 誓いの海（復刻）",
+      "event_20201012_cn": "奔る彩帆の青（復刻）",
+      "event_20210527_cn": "照らす螺旋の鏡海",
+      "event_20220526_cn": "诚閃の剣 搖光の城",
+      "raid_20200624": "特別演習超空強襲波（復刻）",
       "event_20220428_cn": "吟ずる瑠璃の楽章",
       "event_20220414_cn": "極夜照らす幻光（復刻）",
       "event_20220407_tw": "蒼紅的迴響(復刻)",
@@ -490,8 +521,6 @@
       "event_20211111_cn": "燈火のシニエ",
       "event_20211028_tw": "復刻光與影的鳶尾之華",
       "event_20211028_cn": "神穹を衝く聖歌（復刻）",
-      "raid_20210708": "交錯する新たな波 (復刻)",
-      "event_20201012_cn": "奔る彩帆の青",
       "event_20200917_cn": "刹那觀る胡蝶の夢",
       "event_20210916_cn": "駆けよ 碧海の吹き風",
       "event_20210722_cn": "海に響くアイドルの歌",
@@ -502,7 +531,6 @@
       "event_20210624_cn": "翳りし満ちる影の華(復刻)",
       "event_20210624_tw": "穹頂下的聖詠曲",
       "event_20210610_tw": "夜幕下的歸途",
-      "event_20210527_cn": "照らす螺旋の鏡海",
       "event_20210527_tw": "微層混合",
       "event_20210429_tw": "復刻墨染的鋼鐵之花",
       "event_20210415_tw": "復刻圍剿施佩伯爵",
@@ -513,9 +541,7 @@
       "event_20200312_cn": "南洋に靡く硝煙（復刻）",
       "event_20201029_cn": "激唱のユニバース",
       "event_20201002_en": "Counterattack Within the Fjord",
-      "event_20200820_cn": "黒鉄の楽章 誓いの海（復刻）",
       "event_20200716_en": "Ink Stained Steel Sakura Rerun",
-      "raid_20200624": "特別演習超空強襲波（復刻）",
       "event_20200611_en": "Skybound Oratorio",
       "event_20200603_en": "Prelude under the Moon Rerun",
       "event_20200521_en": "Iris of Light and Dark Rerun",
@@ -1071,6 +1097,7 @@
       "help": "Research.UseCube.help",
       "always_use": "always_use",
       "only_05_hour": "only_05_hour",
+      "only_no_project": "only_no_project",
       "do_not_use": "do_not_use"
     },
     "UseCoin": {
@@ -1078,6 +1105,7 @@
       "help": "Research.UseCoin.help",
       "always_use": "always_use",
       "only_05_hour": "only_05_hour",
+      "only_no_project": "only_no_project",
       "do_not_use": "do_not_use"
     },
     "UsePart": {
@@ -1085,17 +1113,23 @@
       "help": "Research.UsePart.help",
       "always_use": "always_use",
       "only_05_hour": "only_05_hour",
+      "only_no_project": "only_no_project",
       "do_not_use": "do_not_use"
     },
     "PresetFilter": {
       "name": "Research.PresetFilter.name",
       "help": "Research.PresetFilter.help",
       "custom": "custom",
-      "series_4_blueprint_tenrai": "series_4_blueprint_tenrai",
-      "series_4_blueprint_only": "series_4_blueprint_only",
-      "series_4_tenrai_only": "series_4_tenrai_only",
-      "series_3": "series_3",
-      "series_3_than_2": "series_3_than_2"
+      "series_4_blueprint_tenrai": "Series 4 Blueprints+Tenrai",
+      "series_4_blueprint_only": "Series 4 Blueprints Only",
+      "series_4_tenrai_only": "Series 4 Tenrai Only",
+      "series_3_blueprint_234": "Series 3 Blueprints+234",
+      "series_3_blueprint_only": "Series 3 Blueprints Only",
+      "series_3_234_only": "Series 3 234 Only",
+      "series_2_than_3_457_234": "Series 2+3 457+234",
+      "series_2_blueprint_457": "Series 2 Blueprints+457",
+      "series_2_blueprint_only": "Series 2 Blueprints Only",
+      "series_2_457_only": "Series 2 457 Only"
     },
     "CustomFilter": {
       "name": "Research.CustomFilter.name",
@@ -1371,7 +1405,7 @@
       "champagne": "champagne"
     }
   },
-  "MedalShop": {
+  "MedalShop2": {
     "_info": {
       "name": "MedalShop._info.name",
       "help": "MedalShop._info.help"
@@ -1379,6 +1413,57 @@
     "Filter": {
       "name": "MedalShop.Filter.name",
       "help": "MedalShop.Filter.help"
+    },
+    "RETROFIT_T1": {
+      "name": "MedalShop.RETROFIT_T1.name",
+      "help": "MedalShop.RETROFIT_T1.help",
+      "dd": "dd",
+      "cl": "cl",
+      "bb": "bb",
+      "cv": "cv"
+    },
+    "RETROFIT_T2": {
+      "name": "MedalShop.RETROFIT_T2.name",
+      "help": "MedalShop.RETROFIT_T2.help",
+      "dd": "dd",
+      "cl": "cl",
+      "bb": "bb",
+      "cv": "cv"
+    },
+    "RETROFIT_T3": {
+      "name": "MedalShop.RETROFIT_T3.name",
+      "help": "MedalShop.RETROFIT_T3.help",
+      "dd": "dd",
+      "cl": "cl",
+      "bb": "bb",
+      "cv": "cv"
+    },
+    "PLATE_T1": {
+      "name": "MedalShop.PLATE_T1.name",
+      "help": "MedalShop.PLATE_T1.help",
+      "general": "general",
+      "gun": "gun",
+      "torpedo": "torpedo",
+      "antiair": "antiair",
+      "plane": "plane"
+    },
+    "PLATE_T2": {
+      "name": "MedalShop.PLATE_T2.name",
+      "help": "MedalShop.PLATE_T2.help",
+      "general": "general",
+      "gun": "gun",
+      "torpedo": "torpedo",
+      "antiair": "antiair",
+      "plane": "plane"
+    },
+    "PLATE_T3": {
+      "name": "MedalShop.PLATE_T3.name",
+      "help": "MedalShop.PLATE_T3.help",
+      "general": "general",
+      "gun": "gun",
+      "torpedo": "torpedo",
+      "antiair": "antiair",
+      "plane": "plane"
     }
   },
   "MeritShop": {
@@ -1574,6 +1659,23 @@
       "first": "first",
       "second": "second",
       "third": "third"
+    },
+    "ModuleDevelopment": {
+      "name": "Daily.ModuleDevelopment.name",
+      "help": "Daily.ModuleDevelopment.help",
+      "skip": "skip",
+      "first": "first",
+      "second": "second"
+    },
+    "ModuleDevelopmentFleet": {
+      "name": "Daily.ModuleDevelopmentFleet.name",
+      "help": "Daily.ModuleDevelopmentFleet.help",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6"
     }
   },
   "Hard": {
@@ -1679,9 +1781,9 @@
       "name": "OpsiGeneral.RepairThreshold.name",
       "help": "OpsiGeneral.RepairThreshold.help"
     },
-    "BuyAkashiShop": {
-      "name": "OpsiGeneral.BuyAkashiShop.name",
-      "help": "OpsiGeneral.BuyAkashiShop.help"
+    "DoRandomMapEvent": {
+      "name": "OpsiGeneral.DoRandomMapEvent.name",
+      "help": "OpsiGeneral.DoRandomMapEvent.help"
     },
     "AkashiShopFilter": {
       "name": "OpsiGeneral.AkashiShopFilter.name",
@@ -1847,6 +1949,10 @@
     "RepairShip": {
       "name": "OpsiDaemon.RepairShip.name",
       "help": "OpsiDaemon.RepairShip.help"
+    },
+    "SelectEnemy": {
+      "name": "OpsiDaemon.SelectEnemy.name",
+      "help": "OpsiDaemon.SelectEnemy.help"
     }
   },
   "Benchmark": {
@@ -1970,11 +2076,11 @@
     "Update": {
       "UpToDate": "Gui.Update.UpToDate",
       "HaveUpdate": "Gui.Update.HaveUpdate",
-      "UpdateFailed": "Gui.Update.UpdateFailed",
       "UpdateStart": "Gui.Update.UpdateStart",
       "UpdateWait": "Gui.Update.UpdateWait",
       "UpdateRun": "Gui.Update.UpdateRun",
       "UpdateSuccess": "Gui.Update.UpdateSuccess",
+      "UpdateFailed": "Gui.Update.UpdateFailed",
       "UpdateChecking": "Gui.Update.UpdateChecking",
       "UpdateCancel": "Gui.Update.UpdateCancel",
       "UpdateFinish": "Gui.Update.UpdateFinish",
@@ -1983,7 +2089,8 @@
       "Author": "Gui.Update.Author",
       "Time": "Gui.Update.Time",
       "Message": "Gui.Update.Message",
-      "DisabledWarn": "Gui.Update.DisabledWarn"
+      "DisabledWarn": "Gui.Update.DisabledWarn",
+      "DetailedHistory": "Gui.Update.DetailedHistory"
     },
     "Text": {
       "InvalidFeedBack": "Gui.Text.InvalidFeedBack"

@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from module.base.button import ButtonGrid
 from module.base.timer import Timer
 from module.handler.assets import INFO_BAR_1
@@ -13,14 +15,16 @@ MEOWFFICER_BOX_GRID = ButtonGrid(
     origin=(460, 210), delta=(160, 0), button_shape=(30, 30), grid_shape=(3, 1),
     name='MEOWFFICER_BOX_GRID')
 MEOWFFICER_BOX_COUNT_GRID = ButtonGrid(
-    origin=(780, 249), delta=(-160, 0), button_shape=(74, 22), grid_shape=(3, 1),
+    origin=(776, 21), delta=(133, 0), button_shape=(65, 27), grid_shape=(3, 1),
     name='MEOWFFICER_BOX_COUNT_GRID')
 MEOWFFICER_BOX_COUNT = Digit(MEOWFFICER_BOX_COUNT_GRID.buttons,
-                             letter=(247, 247, 247), threshold=64,
+                             letter=(99, 69, 41), threshold=128,
                              name='MEOWFFICER_BOX_COUNT')
 
 
 class MeowfficerTrain(MeowfficerCollect, MeowfficerEnhance):
+    _box_count = [0, 0, 0]
+
     def _meow_queue_enter(self, skip_first_screenshot=True):
         """
         Transition into the queuing window to
@@ -106,7 +110,9 @@ class MeowfficerTrain(MeowfficerCollect, MeowfficerEnhance):
             in: MEOWFFICER_TRAIN
             out: MEOWFFICER_TRAIN
         """
-        counts = MEOWFFICER_BOX_COUNT.ocr(self.device.image)
+        # Maintain local box count for
+        # count/click accuracy
+        local_count = deepcopy(self._box_count)
         buttons = MEOWFFICER_BOX_GRID.buttons
         while 1:
             # Number that can be queued
@@ -116,14 +122,18 @@ class MeowfficerTrain(MeowfficerCollect, MeowfficerEnhance):
 
             # Loop as needed to queue boxes appropriately
             for i, j in ((0, 2), (1, 1)):
-                count = counts[i] - remain
+                logger.attr(f'Meowfficer_box_count_rqueue_during (index {i})', local_count)
+                count = local_count[i] - remain
                 if count < 0:
                     self.device.multi_click(buttons[j], remain + count)
+                    local_count[i] -= remain + count
                     remain = abs(count)
                 else:
                     self.device.multi_click(buttons[j], remain)
+                    local_count[i] -= remain
                     break
 
+            logger.attr('Meowfficer_box_count_rqueue_done', local_count)
             self.device.sleep((0.3, 0.5))
             self.device.screenshot()
 
@@ -145,18 +155,18 @@ class MeowfficerTrain(MeowfficerCollect, MeowfficerEnhance):
             in: MEOWFFICER_TRAIN
             out: MEOWFFICER_TRAIN
         """
+        logger.hr('Meowfficer queue', level=1)
         # Either can remain in same window or
         # enter the queuing window
         if not self._meow_queue_enter():
             return
 
-        # Get count; read from meowfficer root page
-        # Cannot reliably read from queuing page
-        counts = MEOWFFICER_BOX_COUNT.ocr(self.device.image)
-        common_sum = counts[0] + counts[1]
+        # Sum of common and elite/sr boxes
+        # Ocr'ed earlier in meow_train else default
+        common_sum = self._box_count[0] + self._box_count[1]
 
         # Check remains
-        if sum(counts) <= 0:
+        if sum(self._box_count) <= 0:
             logger.info('No more meowfficer boxes to train')
             return
 
@@ -191,6 +201,9 @@ class MeowfficerTrain(MeowfficerCollect, MeowfficerEnhance):
         current, remain, total = MEOWFFICER_CAPACITY.ocr(self.device.image)
         logger.attr('Meowfficer_capacity_remain', remain)
 
+        # Read box count, utilized in other helper funcs
+        self._box_count = MEOWFFICER_BOX_COUNT.ocr(self.device.image)
+
         logger.attr('MeowfficerTrain_Mode', self.config.MeowfficerTrain_Mode)
         collected = False
         if self.config.MeowfficerTrain_Mode == 'seamlessly':
@@ -201,7 +214,7 @@ class MeowfficerTrain(MeowfficerCollect, MeowfficerEnhance):
             if remain > 0:
                 collected = self.meow_collect(collect_all=True)
             # Queue
-            self.meow_queue(ascending=True)
+            self.meow_queue(ascending=False)
             # Exit
             self.meow_menu_close()
         else:

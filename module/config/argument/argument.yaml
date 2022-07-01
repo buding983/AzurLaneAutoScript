@@ -8,9 +8,15 @@ Scheduler:
   Enable: false
   NextRun: 2020-01-01 00:00:00
   Command: Alas
-  SuccessInterval: 0
-  FailureInterval: 120
-  ServerUpdate: 00:00
+  SuccessInterval:
+    value: 0
+    type: hide
+  FailureInterval:
+    value: 120
+    type: hide
+  ServerUpdate:
+    value: 00:00
+    type: hide
 Emulator:
   Serial:
     value: auto
@@ -25,6 +31,7 @@ Emulator:
     value: minitouch
     option: [ADB, uiautomator2, minitouch, Hermit]
   ScreenshotDedithering: false
+  AdbRestart: false
 Error:
   HandleError: true
   SaveError: true
@@ -39,14 +46,27 @@ Optimization:
 DropRecord:
   SaveFolder: ./screenshots
   AzurStatsID: null
-  SaveResearch: false
-  UploadResearch: false
-  SaveCommission: false
-  UploadCommission: false
-  SaveCombat: false
-  SaveOpsi: false
-  UploadOpsi: false
-  SaveMeowfficer: false
+  API:
+    value: default
+    option: [default, cn_gz_reverse_proxy, cn_sh_reverse_proxy]
+  ResearchRecord:
+    value: do_not
+    option: [do_not, save, upload, save_and_upload]
+  CommissionRecord:
+    value: do_not
+    option: [do_not, save, upload, save_and_upload]
+  CombatRecord:
+    value: do_not
+    option: [do_not, save]
+  OpsiRecord:
+    value: do_not
+    option: [do_not, save, upload, save_and_upload]
+  MeowfficerBuy:
+    value: do_not
+    option: [do_not, save]
+  MeowfficerTalent:
+    value: do_not
+    option: [do_not, save, upload, save_and_upload]
 Retirement:
   Enable: true
   RetireMode:
@@ -132,7 +152,9 @@ Emotion:
   CalculateEmotion: true
   IgnoreLowEmotionWarn: false
   Fleet1Value: 119
-  Fleet1Record: 2020-01-01 00:00:00
+  Fleet1Record:
+    value: 2020-01-01 00:00:00
+    type: disable
   Fleet1Control:
     value: prevent_yellow_face
     option: [keep_exp_bonus, prevent_green_face, prevent_yellow_face, prevent_red_face]
@@ -141,7 +163,9 @@ Emotion:
     option: [not_in_dormitory, dormitory_floor_1, dormitory_floor_2]
   Fleet1Oath: false
   Fleet2Value: 119
-  Fleet2Record: 2020-01-01 00:00:00
+  Fleet2Record:
+    value: 2020-01-01 00:00:00
+    type: disable
   Fleet2Control:
     value: prevent_yellow_face
     option: [keep_exp_bonus, prevent_green_face, prevent_yellow_face, prevent_red_face]
@@ -248,13 +272,13 @@ ControlExpOverflow:
 Research:
   UseCube:
     value: only_05_hour
-    option: [always_use, only_05_hour, do_not_use]
+    option: [always_use, only_05_hour, only_no_project, do_not_use]
   UseCoin:
     value: always_use
-    option: [always_use, only_05_hour, do_not_use]
+    option: [always_use, only_05_hour, only_no_project, do_not_use]
   UsePart:
     value: always_use
-    option: [always_use, only_05_hour, do_not_use]
+    option: [always_use, only_05_hour, only_no_project, do_not_use]
   PresetFilter:
     value: series_4_blueprint_tenrai
     option:
@@ -262,8 +286,13 @@ Research:
       - series_4_blueprint_tenrai
       - series_4_blueprint_only
       - series_4_tenrai_only
-      - series_3
-      - series_3_than_2
+      - series_3_blueprint_234
+      - series_3_blueprint_only
+      - series_3_234_only
+      - series_2_than_3_457_234
+      - series_2_blueprint_457
+      - series_2_blueprint_only
+      - series_2_457_only
   CustomFilter: |-
     S4-Q0.5 > Q-0.5 > S4-DR0.5 > S4-PRY0.5 > DR-0.5 > PRY-0.5
     > S4-Q1 > S4-Q2
@@ -355,12 +384,32 @@ GuildShop:
   PR3:
     value: cheshire
     option: [cheshire, mainz, odin, champagne]
-MedalShop:
+MedalShop2:
   Filter: |-
     DR > PR
-    > BookRedT3 > BookYellowT3 > BookBlueT3 > BookRedT2 > BookYellowT2 > BookBlueT2
-    > RetrofitT3 > PlateGeneralT3
+    > BookRedT3 > BookYellowT3 > BookBlueT3
+    > BookRedT2 > BookYellowT2 > BookBlueT2
+    > RetrofitT3
     > FoodT6 > FoodT5
+    > PlateGeneralT3 > PlateWildT3
+  RETROFIT_T1:
+    value: cl
+    option: [dd, cl, bb, cv]
+  RETROFIT_T2:
+    value: cl
+    option: [dd, cl, bb, cv]
+  RETROFIT_T3:
+    value: cl
+    option: [dd, cl, bb, cv]
+  PLATE_T1:
+    value: general
+    option: [general, gun, torpedo, antiair, plane]
+  PLATE_T2:
+    value: general
+    option: [general, gun, torpedo, antiair, plane]
+  PLATE_T3:
+    value: general
+    option: [general, gun, torpedo, antiair, plane]
 MeritShop:
   Refresh: false
   Filter: |-
@@ -418,6 +467,12 @@ Daily:
   SupplyLineDisruption:
     value: second
     option: [skip, first, second, third]
+  ModuleDevelopment:
+    value: first
+    option: [skip, first, second]
+  ModuleDevelopmentFleet:
+    value: 5
+    option: [1, 2, 3, 4, 5, 6]
 Hard:
   HardStage: 11-4
   HardFleet:
@@ -447,7 +502,7 @@ OpsiGeneral:
   BuyActionPoint: false
   OilLimit: 1000
   RepairThreshold: 0.4
-  BuyAkashiShop: true
+  DoRandomMapEvent: true
   AkashiShopFilter: |-
     ActionPoint > PurpleCoins
 OpsiAshBeacon:
@@ -491,6 +546,7 @@ Daemon:
   EnterMap: true
 OpsiDaemon:
   RepairShip: true
+  SelectEnemy: true
 Benchmark:
   AdbScreenshot: true
   AdbncScreenshot: true

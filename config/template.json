@@ -5,7 +5,8 @@
       "PackageName": "auto",
       "ScreenshotMethod": "ADB",
       "ControlMethod": "minitouch",
-      "ScreenshotDedithering": false
+      "ScreenshotDedithering": false,
+      "AdbRestart": false
     },
     "Error": {
       "HandleError": true,
@@ -21,14 +22,13 @@
     "DropRecord": {
       "SaveFolder": "./screenshots",
       "AzurStatsID": null,
-      "SaveResearch": false,
-      "UploadResearch": false,
-      "SaveCommission": false,
-      "UploadCommission": false,
-      "SaveCombat": false,
-      "SaveOpsi": false,
-      "UploadOpsi": false,
-      "SaveMeowfficer": false
+      "API": "default",
+      "ResearchRecord": "do_not",
+      "CommissionRecord": "do_not",
+      "CombatRecord": "do_not",
+      "OpsiRecord": "do_not",
+      "MeowfficerBuy": "do_not",
+      "MeowfficerTalent": "do_not"
     }
   },
   "General": {
@@ -809,8 +809,8 @@
       "Enable": true,
       "NextRun": "2020-01-01 00:00:00",
       "Command": "Commission",
-      "SuccessInterval": 30,
-      "FailureInterval": 30,
+      "SuccessInterval": "30-60",
+      "FailureInterval": "30-60",
       "ServerUpdate": "00:00"
     },
     "Commission": {
@@ -823,8 +823,8 @@
       "Enable": true,
       "NextRun": "2020-01-01 00:00:00",
       "Command": "Tactical",
-      "SuccessInterval": 30,
-      "FailureInterval": 30,
+      "SuccessInterval": "30-60",
+      "FailureInterval": "120-240",
       "ServerUpdate": "00:00"
     },
     "Tactical": {
@@ -843,8 +843,8 @@
       "Enable": true,
       "NextRun": "2020-01-01 00:00:00",
       "Command": "Research",
-      "SuccessInterval": 30,
-      "FailureInterval": 30,
+      "SuccessInterval": "30-60",
+      "FailureInterval": "30-60",
       "ServerUpdate": "00:00"
     },
     "Research": {
@@ -919,8 +919,8 @@
       "Enable": true,
       "NextRun": "2020-01-01 00:00:00",
       "Command": "Reward",
-      "SuccessInterval": "60-120",
-      "FailureInterval": "60-120",
+      "SuccessInterval": "120-240",
+      "FailureInterval": "120-240",
       "ServerUpdate": "00:00"
     },
     "Reward": {
@@ -972,8 +972,14 @@
       "PR2": "seattle",
       "PR3": "cheshire"
     },
-    "MedalShop": {
-      "Filter": "DR > PR\n> BookRedT3 > BookYellowT3 > BookBlueT3 > BookRedT2 > BookYellowT2 > BookBlueT2\n> RetrofitT3 > PlateGeneralT3\n> FoodT6 > FoodT5"
+    "MedalShop2": {
+      "Filter": "DR > PR\n> BookRedT3 > BookYellowT3 > BookBlueT3\n> BookRedT2 > BookYellowT2 > BookBlueT2\n> RetrofitT3\n> FoodT6 > FoodT5\n> PlateGeneralT3 > PlateWildT3",
+      "RETROFIT_T1": "cl",
+      "RETROFIT_T2": "cl",
+      "RETROFIT_T3": "cl",
+      "PLATE_T1": "general",
+      "PLATE_T2": "general",
+      "PLATE_T3": "general"
     },
     "MeritShop": {
       "Refresh": false,
@@ -1081,7 +1087,9 @@
       "FierceAssaultFleet": 5,
       "TacticalTraining": "second",
       "TacticalTrainingFleet": 5,
-      "SupplyLineDisruption": "second"
+      "SupplyLineDisruption": "second",
+      "ModuleDevelopment": "first",
+      "ModuleDevelopmentFleet": 5
     }
   },
   "Hard": {
@@ -1264,7 +1272,7 @@
       "BuyActionPoint": false,
       "OilLimit": 1000,
       "RepairThreshold": 0.4,
-      "BuyAkashiShop": true,
+      "DoRandomMapEvent": true,
       "AkashiShopFilter": "ActionPoint > PurpleCoins"
     },
     "OpsiAshBeacon": {
@@ -1275,7 +1283,7 @@
   },
   "OpsiAshAssist": {
     "Scheduler": {
-      "Enable": true,
+      "Enable": false,
       "NextRun": "2020-01-01 00:00:00",
       "Command": "OpsiAshAssist",
       "SuccessInterval": 30,
@@ -1411,7 +1419,8 @@
   },
   "OpsiDaemon": {
     "OpsiDaemon": {
-      "RepairShip": true
+      "RepairShip": true,
+      "SelectEnemy": true
     }
   },
   "Benchmark": {

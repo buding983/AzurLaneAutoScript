@@ -13,15 +13,15 @@ class ManualConfig:
     > Research > Commission > Tactical
     > Exercise
     > Dorm > Meowfficer > Guild > Gacha > SupplyPack
-    > Reward > BattlePass
+    > Reward > MetaReward > BattlePass
     > ShopFrequent > ShopOnce > Shipyard > DataKey
     > OpsiExplore
     > OpsiDaily > OpsiShop
     > OpsiAbyssal > OpsiStronghold > OpsiObscure
     > Daily > Hard > OpsiAshAssist
     > Sos > EventSp > EventAb > EventCd > RaidDaily > WarArchives > MaritimeEscort
-    > OpsiMeowfficerFarming > MetaReward
     > Event > Event2 > Raid > Main > Main2 > Main3
+    > OpsiMeowfficerFarming
     > GemsFarming
     """
 
@@ -75,6 +75,11 @@ class ManualConfig:
     GEMS_EMOTION_TRIGGRED = False
 
     """
+    module.handler
+    """
+    STORY_OPTION = 0
+
+    """
     module.map.fleet
     """
     MAP_HAS_AMBUSH = True
@@ -98,6 +103,7 @@ class ManualConfig:
     MAP_ENEMY_TEMPLATE = ['Light', 'Main', 'Carrier', 'Treasure']
     MAP_SIREN_TEMPLATE = ['DD', 'CL', 'CA', 'BB', 'CV']
     MAP_ENEMY_GENRE_DETECTION_SCALING = {}  # Key: str, Template name, Value: float, scaling factor
+    MAP_ENEMY_GENRE_SIMILARITY = 0.85
     MAP_SIREN_MOVE_WAIT = 1.5  # The enemy moving takes about 1.2 ~ 1.5s.
     MAP_SIREN_COUNT = 0
     MAP_HAS_MYSTERY = True

@@ -2,19 +2,23 @@ from module.combat.assets import EXP_INFO_C, EXP_INFO_D
 from module.daemon.daemon_base import DaemonBase
 from module.exception import CampaignEnd
 from module.logger import logger
-from module.os_combat.combat import Combat, ContinuousCombat
+from module.os.config import OSConfig
+from module.os.fleet import OSFleet
+from module.os_combat.combat import ContinuousCombat
 from module.os_handler.assets import AUTO_SEARCH_REWARD
 from module.os_handler.port import PORT_ENTER, PortHandler
 
 
-class AzurLaneDaemon(DaemonBase, Combat, PortHandler):
+class AzurLaneDaemon(DaemonBase, OSFleet, PortHandler):
     def _os_combat_expected_end(self):
-        if self.appear_then_click(AUTO_SEARCH_REWARD, offset=(20, 50), interval=2):
+        if self.appear_then_click(AUTO_SEARCH_REWARD, offset=(50, 50), interval=2):
             return False
 
         return super()._os_combat_expected_end()
 
     def run(self):
+        self.config.merge(OSConfig())
+        self.config.override(HOMO_EDGE_DETECT=False)
         while 1:
             self.device.screenshot()
 
@@ -38,8 +42,9 @@ class AzurLaneDaemon(DaemonBase, Combat, PortHandler):
 
             # Map events
             if self.handle_map_event():
+                self._nearest_object_click_timer.clear()
                 continue
-            if self.appear_then_click(AUTO_SEARCH_REWARD, offset=(20, 50), interval=2):
+            if self.appear_then_click(AUTO_SEARCH_REWARD, offset=(50, 50), interval=2):
                 continue
 
             # Port repair
@@ -51,6 +56,10 @@ class AzurLaneDaemon(DaemonBase, Combat, PortHandler):
                     self.interval_reset(PORT_ENTER)
                     logger.info('Port repair finished, '
                                 'please move your fleet out of the port in 30s to avoid repairing again')
+
+            if self.config.OpsiDaemon_SelectEnemy:
+                if self.click_nearest_object():
+                    continue
 
             # End
             # No end condition, stop it manually.

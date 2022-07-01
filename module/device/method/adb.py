@@ -36,14 +36,12 @@ def retry(func):
                 logger.error(e)
 
                 def init():
-                    self.adb_disconnect(self.serial)
-                    self.adb_connect(self.serial)
+                    self.adb_reconnect()
             # AdbError
             except AdbError as e:
                 if handle_adb_error(e):
                     def init():
-                        self.adb_disconnect(self.serial)
-                        self.adb_connect(self.serial)
+                        self.adb_reconnect()
                 else:
                     break
             # Package not installed
@@ -103,7 +101,7 @@ class Adb(Connection):
                 continue
 
         self.__screenshot_method_fixed = self.__screenshot_method
-        if len(screenshot) < 100:
+        if len(screenshot) < 500:
             logger.warning(f'Unexpected screenshot: {screenshot}')
         raise OSError(f'cannot load screenshot')
 
@@ -118,7 +116,7 @@ class Adb(Connection):
     @retry
     def screenshot_adb_nc(self):
         data = self.adb_shell_nc(['screencap'])
-        if len(data) < 100:
+        if len(data) < 500:
             logger.warning(f'Unexpected screenshot: {data}')
 
         # Load data

@@ -14,12 +14,12 @@ from module.map.map_grids import SelectedGrids
 from module.map.utils import location_ensure
 from module.map_detection.utils import area2corner, corner2inner
 from module.ocr.ocr import Ocr
-from module.os.assets import STRONGHOLD_PERCENTAGE, TEMPLATE_EMPTY_HP
+from module.os.assets import MAP_GOTO_GLOBE, STRONGHOLD_PERCENTAGE, TEMPLATE_EMPTY_HP, FLEET_EMP_DEBUFF
 from module.os.camera import OSCamera
 from module.os.map_base import OSCampaignMap
 from module.os_ash.ash import OSAsh
 from module.os_combat.combat import Combat
-from module.os_handler.assets import IN_MAP
+from module.os_handler.assets import CLICK_SAFE_AREA, IN_MAP, PORT_ENTER, PORT_SUPPLY_CHECK
 
 FLEET_FILTER = Filter(regex=re.compile('fleet-?(\d)'), attr=('fleet',), preset=('callsubmarine',))
 
@@ -85,10 +85,10 @@ class OSFleet(OSCamera, Combat, Fleet, OSAsh):
         self.hp_get()
         self.lv_reset()
         self.lv_get()
-        self.ensure_edge_insight(preset=self.map.in_map_swipe_preset_data)
+        self.ensure_edge_insight(preset=self.map.in_map_swipe_preset_data, swipe_limit=(6, 5))
         # self.full_scan(must_scan=self.map.camera_data_spawn_point)
-        self.find_current_fleet()
-        self.find_path_initial()
+        # self.find_current_fleet()
+        # self.find_path_initial()
         # self.map.show_cost()
         # self.round_reset()
         # self.round_battle()
@@ -249,6 +249,12 @@ class OSFleet(OSCamera, Combat, Fleet, OSAsh):
                 Default to True, use False in abyssal zones.
             drop (DropImage):
 
+        Returns：
+            str: Things that fleet met on its way,
+                'event', 'search', 'akashi', 'combat',
+                or their combinations like 'event_akashi', 'event_combat',
+                or an empty string '' if nothing met.
+
         Raises:
             MapWalkError: If unable to goto such grid.
         """
@@ -258,6 +264,7 @@ class OSFleet(OSCamera, Combat, Fleet, OSAsh):
         self.device.screenshot_interval_set(0.35)
         if confirm_timer is None:
             confirm_timer = Timer(0.8, count=2)
+        result = set()
 
         confirm_timer.reset()
         while 1:
@@ -269,6 +276,7 @@ class OSFleet(OSCamera, Combat, Fleet, OSAsh):
             # Map event
             if self.handle_map_event(drop=drop):
                 confirm_timer.reset()
+                result.add('event')
                 continue
             if self.handle_retirement():
                 confirm_timer.reset()
@@ -278,6 +286,12 @@ class OSFleet(OSCamera, Combat, Fleet, OSAsh):
                     raise MapWalkError('walk_out_of_step')
                 else:
                     continue
+
+            # Accident click
+            if self.is_in_globe():
+                self.os_globe_goto_map()
+                confirm_timer.reset()
+                continue
 
             # Enemy searching
             if not enemy_searching_appear and self.enemy_searching_appear():
@@ -290,6 +304,7 @@ class OSFleet(OSCamera, Combat, Fleet, OSAsh):
                     self.device.sleep(0.3)
                     logger.info('Enemy searching appeared.')
                     enemy_searching_appear = False
+                    result.add('search')
                 if self.is_in_map():
                     self.enemy_searching_color_initial()
 
@@ -299,6 +314,15 @@ class OSFleet(OSCamera, Combat, Fleet, OSAsh):
                 # self.ui_back(check_button=self.is_in_map)
                 self.combat(expected_end=self.is_in_map, fleet_index=self.fleet_show_index, save_get_items=drop)
                 confirm_timer.reset()
+                result.add('event')
+                continue
+
+            # Akashi shop
+            if self.appear(PORT_SUPPLY_CHECK, offset=(20, 20)):
+                self.interval_clear(PORT_SUPPLY_CHECK)
+                self.handle_akashi_supply_buy(CLICK_SAFE_AREA)
+                confirm_timer.reset()
+                result.add('akashi')
                 continue
 
             # Arrive
@@ -316,8 +340,10 @@ class OSFleet(OSCamera, Combat, Fleet, OSAsh):
             else:
                 confirm_timer.reset()
 
-        logger.info('Walk stabled')
+        result = '_'.join(result)
+        logger.info(f'Walk stabled, result: {result}')
         self.device.screenshot_interval_set()
+        return result
 
     def port_goto(self):
         """
@@ -331,13 +357,26 @@ class OSFleet(OSCamera, Combat, Fleet, OSAsh):
             MapWalkError: If unable to goto such grid.
                 Probably clicking at land, center of port, or fleet itself.
         """
+        confirm_timer = Timer(3, count=6).start()
         while 1:
             # Calculate destination
             grid = self.radar.port_predict(self.device.image)
             logger.info(f'Port route at {grid}')
-            if np.linalg.norm(grid) == 0:
+            radar_arrive = np.linalg.norm(grid) == 0
+            port_arrive = self.appear(PORT_ENTER, offset=(20, 20))
+            if port_arrive:
                 logger.info('Arrive port')
                 break
+            elif not port_arrive and radar_arrive:
+                if confirm_timer.reached():
+                    logger.warning('Arrive port on radar but port entrance not appear')
+                    raise MapWalkError
+                else:
+                    logger.info('Arrive port on radar but port entrance not appear, confirming')
+                    self.device.screenshot()
+                    continue
+            else:
+                confirm_timer.reset()
 
             # Update local view
             self.update_os()
@@ -487,7 +526,7 @@ class OSFleet(OSCamera, Combat, Fleet, OSAsh):
                     logger.info('Fleet left boss, boss found')
                     break
 
-            # Re-enter boss accidently
+            # Re-enter boss accidentally
             if self.combat_appear():
                 self.ui_back(check_button=self.is_in_map)
 
@@ -521,8 +560,7 @@ class OSFleet(OSCamera, Combat, Fleet, OSAsh):
         fleets = self.parse_fleet_filter()
         with self.stat.new(
                 genre=inflection.underscore(self.config.task.command),
-                save=self.config.DropRecord_SaveOpsi,
-                upload=self.config.DropRecord_UploadOpsi
+                method=self.config.DropRecord_OpsiRecord
         ) as drop:
             for fleet in fleets:
                 logger.hr(f'Turn: {fleet}', level=2)
@@ -607,3 +645,64 @@ class OSFleet(OSCamera, Combat, Fleet, OSAsh):
 
         logger.warning(f'Unexpected STRONGHOLD_PERCENTAGE: {result}')
         return result
+
+    def get_second_fleet(self):
+        """
+        Get a second fleet to unlock fleet mechanism that requires 2 fleets.
+
+        Returns:
+            int:
+        """
+        current = self.fleet_selector.get()
+        if current == 1:
+            second = 2
+        else:
+            second = 1
+        logger.attr('Second_fleet', second)
+        return second
+
+    @staticmethod
+    def fleet_walk_limit(outside, step=3):
+        if np.linalg.norm(outside) <= 3:
+            return outside
+        if step == 1:
+            grids = np.array([
+                (0, -1), (0, 1), (-1, 0), (1, 0),
+            ])
+        else:
+            grids = np.array([
+                (0, -3), (0, 3), (-3, 0), (3, 0),
+                (2, -2), (2, 2), (-2, 2), (2, 2),
+            ])
+        degree = np.sum(grids * outside, axis=1) / np.linalg.norm(grids, axis=1) / np.linalg.norm(outside)
+        return grids[np.argmax(degree)]
+
+    _nearest_object_click_timer = Timer(2)
+
+    def click_nearest_object(self):
+        if not self._nearest_object_click_timer.reached():
+            return False
+        if not self.appear(MAP_GOTO_GLOBE, offset=(200, 20)):
+            return False
+        if self.appear(PORT_ENTER, offset=(20, 20)):
+            return False
+
+        self.update_os()
+        self.view.predict()
+        self.radar.predict(self.device.image)
+        self.radar.show()
+        nearest = self.radar.nearest_object()
+        if nearest is None:
+            self._nearest_object_click_timer.reset()
+            return False
+
+        step = 1 if self.appear(FLEET_EMP_DEBUFF, offset=(50, 20)) else 3
+        nearest = self.fleet_walk_limit(nearest.location, step=step)
+        try:
+            nearest = self.convert_radar_to_local(nearest)
+        except KeyError:
+            logger.info('Radar grid not on local map')
+            self._nearest_object_click_timer.reset()
+            return False
+        self.device.click(nearest)
+        self._nearest_object_click_timer.reset()

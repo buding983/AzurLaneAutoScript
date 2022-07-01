@@ -19,9 +19,11 @@ def is_port_using(port_num):
     s.settimeout(2)
 
     try:
-        result = s.connect_ex(('127.0.0.1', port_num))
-        # if port is using, return code should be 0. (can be connected)
-        return result == 0
+        s.bind(('127.0.0.1', port_num))
+        return False
+    except OSError:
+        # Address already bind
+        return True
     finally:
         s.close()
 
@@ -144,6 +146,32 @@ def del_cached_property(obj, name):
         del obj.__dict__[name]
 
 
+def get_serial_pair(serial):
+    """
+    Args:
+        serial (str):
+
+    Returns:
+        str, str: `127.0.0.1:5555+{X}` and `emulator-5554+{X}`, 0 <= X <= 32
+    """
+    if serial.startswith('127.0.0.1:'):
+        try:
+            port = int(serial[10:])
+            if 5555 <= port <= 5555 + 32:
+                return f'127.0.0.1:{port}', f'emulator-{port - 1}'
+        except (ValueError, IndexError):
+            pass
+    if serial.startswith('emulator-'):
+        try:
+            port = int(serial[9:])
+            if 5554 <= port <= 5554 + 32:
+                return f'127.0.0.1:{port + 1}', f'emulator-{port}'
+        except (ValueError, IndexError):
+            pass
+
+    return None, None
+
+
 class IniterNoMinicap(u2.init.Initer):
     @property
     def minicap_urls(self):
@@ -203,3 +231,10 @@ class HierarchyButton:
 
     def __str__(self):
         return self.name
+
+    @cached_property
+    def focused(self):
+        if self.exist:
+            return self.nodes[0].attrib.get("focused").lower() == 'true'
+        else:
+            return False

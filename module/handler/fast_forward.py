@@ -1,3 +1,5 @@
+import os
+
 from module.base.timer import Timer
 from module.base.utils import color_bar_percentage
 from module.handler.assets import *
@@ -14,6 +16,31 @@ fleet_lock.add_status('off', check_button=FLEET_UNLOCKED)
 auto_search = Switch('Auto_Search', offset=(20, 20))
 auto_search.add_status('on', check_button=AUTO_SEARCH_ON)
 auto_search.add_status('off', check_button=AUTO_SEARCH_OFF)
+
+
+def map_files(event):
+    """
+    Args:
+        event (str): Event name under './campaign'
+
+    Returns:
+        list[str]: List of map files, such as ['sp1', 'sp2', 'sp3']
+    """
+    folder = f'./campaign/{event}'
+
+    if not os.path.exists(folder):
+        logger.warning(f'Map file folder: {folder} does not exist, can not get map files')
+        return []
+
+    files = []
+    for file in os.listdir(folder):
+        name, ext = os.path.splitext(file)
+        if ext != '.py':
+            continue
+        if name == 'campaign_base':
+            continue
+        files.append(name)
+    return files
 
 
 class FastForwardHandler(AutoSearchHandler):
@@ -67,12 +94,13 @@ class FastForwardHandler(AutoSearchHandler):
         self.map_is_100_percent_clear = self.map_clear_percentage > 0.95
         self.map_is_3_stars = self.map_achieved_star_1 and self.map_achieved_star_2 and self.map_achieved_star_3
         self.map_is_threat_safe = self.appear(MAP_GREEN)
-        self.map_has_clear_mode = self.map_is_100_percent_clear and fast_forward.appear(main=self)
         if self.config.Campaign_Name.lower() == 'sp':
             # Minor issue here
             # Using auto_search option because clear mode cannot be detected whether on SP
             # If user manually turn off auto search, alas can't enable it again
-            self.map_has_clear_mode &= auto_search.appear(main=self)
+            self.map_has_clear_mode = auto_search.appear(main=self)
+        else:
+            self.map_has_clear_mode = self.map_is_100_percent_clear and fast_forward.appear(main=self)
 
         # Override config
         if self.map_achieved_star_1:
@@ -250,7 +278,8 @@ class FastForwardHandler(AutoSearchHandler):
             name (str):
 
         Returns:
-            str: Name of next stage, or origin name if unable to increase.
+            str: Name of next stage in upper case,
+                or origin name if unable to increase.
         """
         name = name.upper()
         for increase in self.STAGE_INCREASE:
@@ -258,7 +287,19 @@ class FastForwardHandler(AutoSearchHandler):
             if name in increase:
                 index = increase.index(name) + 1
                 if index < len(increase):
-                    return increase[index]
+                    new = increase[index]
+                    # Don't check main stages, assume all exist
+                    # Main stages are named like campaign_7_2, but user inputs 7-2
+                    if self.config.Campaign_Event == 'campaign_main':
+                        return new
+                    # Check if map file exist
+                    existing = map_files(self.config.Campaign_Event)
+                    logger.info(f'Existing files: {existing}')
+                    if new.lower() in existing:
+                        return new
+                    else:
+                        logger.info(f'Stage increase reach end, new map {new} does not exist')
+                        return name
                 else:
                     logger.info('Stage increase reach end')
                     return name
@@ -294,8 +335,8 @@ class FastForwardHandler(AutoSearchHandler):
         Disable current task or increase stage.
         """
         if self.config.StopCondition_StageIncrease:
-            prev_stage = self.config.Campaign_Name
-            next_stage = self.campaign_name_increase(prev_stage)
+            prev_stage = self.config.Campaign_Name.upper()
+            next_stage = self.campaign_name_increase(prev_stage).upper()
             if next_stage != prev_stage:
                 logger.info(f'Stage {prev_stage} increases to {next_stage}')
                 self.config.Campaign_Name = next_stage

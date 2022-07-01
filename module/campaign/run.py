@@ -5,8 +5,8 @@ import os
 from module.campaign.assets import *
 from module.campaign.campaign_base import CampaignBase
 from module.config.config import AzurLaneConfig
-from module.config.utils import deep_get
 from module.exception import CampaignEnd, RequestHumanTakeover, ScriptEnd
+from module.handler.fast_forward import map_files
 from module.logger import logger
 from module.ocr.ocr import Digit
 from module.ui.ui import UI
@@ -48,11 +48,10 @@ class CampaignRun(UI):
             self.module = importlib.import_module('.' + name, f'campaign.{folder}')
         except ModuleNotFoundError:
             logger.warning(f'Map file not found: campaign.{folder}.{name}')
-            folder = f'./campaign/{folder}'
-            if not os.path.exists(folder):
-                logger.warning(f'Folder not exists: {folder}')
+            if not os.path.exists(f'./campaign/{folder}'):
+                logger.warning(f'Folder not exists: ./campaign/{folder}')
             else:
-                files = [f[:-3] for f in os.listdir(folder) if f[-3:] == '.py']
+                files = map_files(folder)
                 logger.warning(f'Existing files: {files}')
 
             logger.critical(f'Possible reason #1: This event ({folder}) does not have {name}')
@@ -139,7 +138,7 @@ class CampaignRun(UI):
         Returns:
             str, str: name, folder
         """
-        name = name.lower()
+        name = str(name).lower()
         if name[0].isdigit():
             name = 'campaign_' + name.lower().replace('-', '_')
         if folder == 'event_20201126_cn' and name == 'vsp':
@@ -150,6 +149,14 @@ class CampaignRun(UI):
             name = 'sp'
 
         return name, folder
+
+    def can_use_auto_search_continue(self):
+        # Cannot update map info in auto search menu
+        # Close it if map achievement is set
+        if self.config.StopCondition_MapAchievement != 'non_stop':
+            return False
+
+        return self.run_count > 0 and self.campaign.map_is_auto_search
 
     def handle_commission_notice(self):
         """
@@ -162,11 +169,10 @@ class CampaignRun(UI):
         Pages:
             in: page_campaign
         """
-        if deep_get(self.config.data, keys='Commission.Scheduler.Enable', default=False):
-            if self.campaign.commission_notice_show_at_campaign():
-                logger.info('Commission notice found')
-                self.config.task_call('Commission')
-                self.config.task_stop('Commission notice found')
+        if self.campaign.commission_notice_show_at_campaign():
+            logger.info('Commission notice found')
+            self.config.task_call('Commission', force_call=True)
+            self.config.task_stop('Commission notice found')
 
     def run(self, name, folder='campaign_main', mode='normal', total=0):
         """
@@ -195,6 +201,7 @@ class CampaignRun(UI):
                 logger.info(f'Count: {self.run_count}')
 
             # UI ensure
+            self.device.click_record_clear()
             if not hasattr(self.device, 'image') or self.device.image is None:
                 self.device.screenshot()
             self.campaign.device.image = self.device.image
@@ -206,7 +213,7 @@ class CampaignRun(UI):
                     pass
                 self.campaign.ensure_campaign_ui(name=self.stage, mode=mode)
             elif self.campaign.is_in_auto_search_menu():
-                if self.run_count > 0 and self.campaign.map_is_auto_search:
+                if self.can_use_auto_search_continue():
                     logger.info('In auto search menu, skip ensure_campaign_ui.')
                 else:
                     logger.info('In auto search menu, closing.')

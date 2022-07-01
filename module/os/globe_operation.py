@@ -4,6 +4,7 @@ from module.exception import GameTooManyClickError
 from module.logger import logger
 from module.os.assets import *
 from module.os_handler.action_point import ActionPointHandler
+from module.os_handler.assets import AUTO_SEARCH_REWARD
 from module.os_handler.map_event import MapEventHandler
 
 ZONE_TYPES = [ZONE_DANGEROUS, ZONE_SAFE, ZONE_OBSCURE, ZONE_ABYSSAL, ZONE_STRONGHOLD, ZONE_ARCHIVE]
@@ -130,7 +131,10 @@ class GlobeOperation(ActionPointHandler, MapEventHandler):
         Returns:
             list[Button]:
         """
-        return [select for select in ZONE_SELECT if self.appear(select, offset=self._zone_select_offset)]
+        # Lower threshold to 0.75
+        # Don't know why buy but fonts are different sometimes
+        return [select for select in ZONE_SELECT if
+                self.appear(select, offset=self._zone_select_offset, threshold=0.75)]
 
     def is_in_zone_select(self):
         """
@@ -260,8 +264,8 @@ class GlobeOperation(ActionPointHandler, MapEventHandler):
             in: is_in_globe
             out: is_in_map
         """
-        return self.ui_click(GLOBE_GOTO_MAP, check_button=self.is_in_map, offset=(200, 5),
-                             skip_first_screenshot=skip_first_screenshot)
+        return self.ui_click(GLOBE_GOTO_MAP, check_button=self.is_in_map, offset=(20, 20),
+                             retry_wait=3, skip_first_screenshot=skip_first_screenshot)
 
     def os_map_goto_globe(self, unpin=True, skip_first_screenshot=True):
         """
@@ -290,7 +294,11 @@ class GlobeOperation(ActionPointHandler, MapEventHandler):
                 continue
             if self.handle_map_event():
                 continue
+            # Popup: AUTO_SEARCH_REWARD appears slowly
+            if self.appear_then_click(AUTO_SEARCH_REWARD, offset=(50, 50), interval=5):
+                continue
             # Popup: Leaving current zone will terminate meowfficer searching.
+            # Popup: Leaving current zone will retreat submarines
             # Searching reward will be shown after entering another zone.
             if self.handle_popup_confirm('GOTO_GLOBE'):
                 continue

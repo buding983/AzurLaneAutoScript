@@ -9,6 +9,7 @@ from module.base.filter import Filter
 from module.config.config_generated import GeneratedConfig
 from module.config.config_manual import ManualConfig, OutputConfig
 from module.config.config_updater import ConfigUpdater
+from module.config.watcher import ConfigWatcher
 from module.config.utils import *
 from module.exception import RequestHumanTakeover, ScriptError
 from module.logger import logger
@@ -55,7 +56,7 @@ def name_to_function(name):
     return function
 
 
-class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig):
+class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig, ConfigWatcher):
     stop_event: threading.Event = None
     bound = {}
 
@@ -114,7 +115,6 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig):
 
     def load(self):
         self.data = self.read_file(self.config_name)
-        ConfigTypeChecker.check(self.data)
         #self.config_override()
 
         for path, value in self.modified.items():
@@ -168,6 +168,7 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig):
         """
         pending = []
         waiting = []
+        error = []
         now = datetime.now()
         if AzurLaneConfig.is_hoarding_task:
             now -= self.hoarding
@@ -175,7 +176,9 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig):
             func = Function(func)
             if not func.enable:
                 continue
-            if func.next_run < now:
+            if not isinstance(func.next_run, datetime):
+                error.append(func)
+            elif func.next_run < now:
                 pending.append(func)
             else:
                 waiting.append(func)
@@ -186,6 +189,8 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig):
             pending = f.apply(pending, func=lambda x: x.enable)
         if waiting:
             waiting = sorted(waiting, key=operator.attrgetter('next_run'))
+        if error:
+            pending = error + pending
 
         self.pending_task = pending
         self.waiting_task = waiting
@@ -227,7 +232,7 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig):
         logger.info(f'Save config {filepath_config(self.config_name)}, {dict_to_kv(self.modified)}')
         # Don't use self.modified = {}, that will create a new object.
         self.modified.clear()
-        write_file(filepath_config(self.config_name), data=self.data)
+        self.write_file(self.config_name, data=self.data)
 
     def update(self):
         self.load()
@@ -239,7 +244,7 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig):
         People migrating from manual game play to bot have a hard time giving up old usage habitat,
         so, teach them how to play games and how to use Alas.
         """
-        now = datetime.now()
+        now = datetime.now().replace(microsecond=0)
         limited = set()
 
         def limit_next_run(tasks, limit):
@@ -259,10 +264,11 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig):
                     logger.warning(f'Task {task} is force to enable')
                     self.modified[f'{task}.Scheduler.Enable'] = True
 
-        force_enable(['Commission', 'Tactical', 'Research', 'Reward'])
-        limit_next_run(['Commission', 'Tactical', 'Research', 'Reward'], limit=now + timedelta(hours=12, minutes=10))
-        limit_next_run(['OpsiExplore'], limit=now + timedelta(days=31, minutes=10))
-        limit_next_run(self.args.keys(), limit=now + timedelta(hours=24, minutes=10))
+        force_enable(['Commission', 'Research', 'Reward'])
+        limit_next_run(['Commission', 'Reward'], limit=now + timedelta(hours=12, seconds=-1))
+        limit_next_run(['Research'], limit=now + timedelta(hours=24, seconds=-1))
+        limit_next_run(['OpsiExplore'], limit=now + timedelta(days=31, seconds=-1))
+        limit_next_run(self.args.keys(), limit=now + timedelta(hours=24, seconds=-1))
 
     def override(self, **kwargs):
         """
@@ -382,7 +388,7 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig):
         if recon_scan:
             tasks = SelectedGrids(['OpsiExplore', 'OpsiObscure', 'OpsiStronghold'])
             tasks = tasks.delete(tasks.filter(is_force_run)).delete(tasks.filter(is_special_radar))
-            delay_tasks(tasks, minutes=30)
+            delay_tasks(tasks, minutes=27)
         if submarine_call:
             tasks = SelectedGrids(['OpsiExplore', 'OpsiDaily', 'OpsiObscure', 'OpsiAbyssal', 'OpsiStronghold',
                                    'OpsiMeowfficerFarming'])
@@ -399,7 +405,7 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig):
 
         self.update()
 
-    def task_call(self, task):
+    def task_call(self, task, force_call=True):
         """
         Call another task to run.
 
@@ -410,16 +416,23 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig):
 
         Args:
             task (str): Task name to call, such as `Restart`
+            force_call (bool):
+
+        Returns:
+            bool: If called.
         """
-        path = f'{task}.Scheduler.NextRun'
-        if deep_get(self.data, keys=path, default=None) is None:
+        if deep_get(self.data, keys=f'{task}.Scheduler.NextRun', default=None) is None:
             raise ScriptError(f'Task to call: `{task}` does not exist in user config')
-        else:
-            self.modified[path] = datetime(2021, 1, 1, 0, 0, 0)
-            if task == 'Restart':
-                # Restart is forced to enable
-                self.modified[f'{task}.Scheduler.Enable'] = True
+
+        if force_call or deep_get(self.data, keys=f'{task}.Scheduler.Enable', default=False):
+            logger.info(f'Task call: {task}')
+            self.modified[f'{task}.Scheduler.NextRun'] = datetime.now().replace(microsecond=0)
+            self.modified[f'{task}.Scheduler.Enable'] = True
             self.update()
+            return True
+        else:
+            logger.info(f'Task call: {task} (skipped because disabled by user)')
+            return False
 
     @staticmethod
     def task_stop(message=''):
@@ -614,34 +627,3 @@ class MultiSetWrapper:
         if not self.in_wrapper:
             self.main.update()
             self.main.auto_update = True
-
-
-class ConfigTypeChecker:
-    checkers = [
-        (['Scheduler', 'NextRun'], datetime),
-        (['Emotion', 'Fleet1Record'], datetime),
-        (['Emotion', 'Fleet2Record'], datetime),
-        (['Exercise', 'OpponentRefreshRecord'], datetime),
-    ]
-
-    @classmethod
-    def check(cls, data):
-        """
-        Args:
-            data (dict): User config.
-
-        Raises:
-            RequestHumanTakeover: If there's invalid setting.
-        """
-        for func, func_data in data.items():
-            for path, typ in cls.checkers:
-                value = deep_get(func_data, keys=path, default=None)
-                if value is None:
-                    continue
-                if not isinstance(value, typ):
-                    logger.critical(f'Task `{func}` has an invalid setting {".".join(path)}="{str(value)}". '
-                                    f'Current type: {type_to_str(value)}, expected type: {type_to_str(typ)}')
-                    logger.critical('Please check your settings')
-                    raise RequestHumanTakeover(
-                        f'Task `{func}` has an invalid setting {".".join(path)}="{str(value)}". '
-                        f'Current type: {type_to_str(value)}, expected type: {type_to_str(typ)}')

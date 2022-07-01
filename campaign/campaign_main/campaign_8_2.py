@@ -22,7 +22,6 @@ MAP.weight_data = """
     20 20 20 10 10 20 20 35
     50 90 90 60 60 90 90 90
     90 90 90 70 80 90 90 90
-    
 """
 MAP.spawn_data = [
     {'battle': 0, 'enemy': 3},
@@ -47,7 +46,7 @@ step_on = SelectedGrids([D3, E3])
 
 
 class Config(ConfigBase):
-    pass
+    HOMO_EDGE_HOUGHLINES_THRESHOLD = 210
 
 
 class Campaign(CampaignBase):

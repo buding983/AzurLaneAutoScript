@@ -1,5 +1,6 @@
 import re
 from datetime import timedelta
+from functools import partial
 
 from scipy import signal
 
@@ -167,12 +168,12 @@ def get_research_series_jp(image):
         series (string):
     """
     # Set 'prominence = 50' to ignore possible noise.
-    parameters = {'height': 200, 'prominence': 50}
+    parameters = {'height': 160, 'prominence': 50, 'width': 1}
 
     area = SERIES_DETAIL.area
     # Resize is not needed because only one area will be checked in JP server.
     im = color_similarity_2d(crop(image, area), color=(255, 255, 255))
-    peaks = [len(signal.find_peaks(row, **parameters)[0]) for row in im[2:-2]]
+    peaks = [len(signal.find_peaks(row, **parameters)[0]) for row in im[5:-5]]
     upper, lower = max(peaks), min(peaks)
     # print(upper, lower)
     if upper == lower and 1 <= upper <= 3:
@@ -224,7 +225,7 @@ def get_research_cost_jp(image):
     When the research has 2 cost items, the size of each is 77*77.
     However, templates of coins, cubes, and plates differ a lot with each other,
     so simply setting a lower threshold while matching can do the job.
-    
+
     Args:
         image (np.ndarray): Screenshot
 
@@ -251,7 +252,7 @@ def get_research_cost_jp(image):
                 costs[cost] = True
                 continue
 
-    # Rename keys to be the same as attrs of ResearchProjectJp.    
+    # Rename keys to be the same as attrs of ResearchProjectJp.
     costs['need_coin'] = costs.pop('coin')
     costs['need_cube'] = costs.pop('cube')
     costs['need_part'] = costs.pop('plate')
@@ -262,7 +263,7 @@ def get_research_ship_jp(image):
     """
     Notice that 2.5, 5, and 8 hours' D research have 4 items, while 0.5 hours' one has 3,
     so the button DETAIL_BLUEPRINT should not cover only the first one of 4 items.
-    
+
     Args:
         image (np.ndarray): Screenshot
 
@@ -291,7 +292,7 @@ def research_jp_detect(image):
     """
     Args:
         image (np.ndarray): Screenshot
-            
+
     Return:
         project (ResearchProjectJp):
     """
@@ -310,6 +311,22 @@ def research_jp_detect(image):
     if not project.check_valid():
         logger.warning(f'Invalid research {project}')
     return project
+
+
+def research_detect(image):
+    """
+    Args:
+        image (np.ndarray): Screenshot
+
+    Return:
+        list[ResearchProject]:
+    """
+    projects = []
+    for name, series in zip(get_research_name(image), get_research_series(image)):
+        project = ResearchProject(name=name, series=series)
+        logger.attr('Project', project)
+        projects.append(project)
+    return projects
 
 
 class ResearchProject:
@@ -521,7 +538,7 @@ class ResearchSelector(UI):
                 break
 
     @Config.when(SERVER='jp')
-    def research_detect(self, image):
+    def research_detect(self):
         """
         We do not need a screenshot here actually. 'image' is a null argument.
         Adding this argument is just to eusure all "research_detect" have the same arguments.
@@ -548,7 +565,7 @@ class ResearchSelector(UI):
             self.research_detail_quit()
         """
         page_research should remain the same as before.
-        Since we entered the 4th entrance first, 
+        Since we entered the 4th entrance first,
         the indexes from left to right are (2, 3, 4, 0, 1).
         """
         for pos in range(5):
@@ -557,20 +574,32 @@ class ResearchSelector(UI):
         self.projects = proj_sorted
 
     @Config.when(SERVER=None)
-    def research_detect(self, image):
+    def research_detect(self):
         """
         Args:
             image (np.ndarray): Screenshots
         """
-        projects = []
-        for name, series in zip(get_research_name(image), get_research_series(image)):
-            project = ResearchProject(name=name, series=series)
-            logger.attr('Project', project)
-            projects.append(project)
+        timeout = Timer(3, count=3).start()
+        while 1:
+            projects = research_detect(self.device.image)
+
+            if timeout.reached():
+                break
+
+            if sum([p.valid for p in projects]) == 4 and not projects[0].valid:
+                # Leftmost research series covered by battle pass info, see #1037
+                logger.info('Wrong research serial on the leftmost project, '
+                            'probably because of battle pass info')
+                # A rare case, poor sleep is acceptable
+                self.device.sleep(1)
+                self.device.screenshot()
+                continue
+            else:
+                break
 
         self.projects = projects
 
-    def research_sort_filter(self):
+    def research_sort_filter(self, enforce=False):
         """
         Returns:
             list: A list of ResearchProject objects and preset strings,
@@ -581,7 +610,7 @@ class ResearchSelector(UI):
         if preset == 'custom':
             string = self.config.Research_CustomFilter
         else:
-            if self.config.Research_UseCube == 'always_use':
+            if self.config.Research_UseCube == 'always_use' or enforce:
                 if f'{preset}_cube' in DICT_FILTER_PRESET:
                     preset = f'{preset}_cube'
             if preset not in DICT_FILTER_PRESET:
@@ -595,17 +624,17 @@ class ResearchSelector(UI):
         string = string.lower().replace('hakuryuu', 'hakuryu')
 
         FILTER.load(string)
-        priority = FILTER.apply(self.projects, func=self._research_check)
+        priority = FILTER.apply(self.projects, func=partial(self._research_check, enforce=enforce))
 
         # Log
         logger.attr('Filter_sort', ' > '.join([str(project) for project in priority]))
         return priority
 
-    def _research_check(self, project):
+    def _research_check(self, project, enforce=False):
         """
         Args:
             project (ResearchProject):
-
+            enforce (Bool):
         Returns:
             bool:
         """
@@ -617,17 +646,23 @@ class ResearchSelector(UI):
         if project.need_cube:
             if self.config.Research_UseCube == 'do_not_use':
                 return False
-            if self.config.Research_UseCube == 'only_05_hour' and not is_05:
+            if self.config.Research_UseCube == 'only_no_project' and not enforce:
+                return False
+            if self.config.Research_UseCube == 'only_05_hour' and not is_05 and not enforce:
                 return False
         if project.need_coin:
             if self.config.Research_UseCoin == 'do_not_use':
                 return False
-            if self.config.Research_UseCoin == 'only_05_hour' and not is_05:
+            if self.config.Research_UseCoin == 'only_no_project' and not enforce:
+                return False
+            if self.config.Research_UseCoin == 'only_05_hour' and not is_05 and not enforce:
                 return False
         if project.need_part:
             if self.config.Research_UsePart == 'do_not_use':
                 return False
-            if self.config.Research_UsePart == 'only_05_hour' and not is_05:
+            if self.config.Research_UsePart == 'only_no_project' and not enforce:
+                return False
+            if self.config.Research_UsePart == 'only_05_hour' and not is_05 and not enforce:
                 return False
 
         # Reasons to ignore B series and E-2:
@@ -639,8 +674,9 @@ class ResearchSelector(UI):
         if project.genre.upper() == 'B':
             return False
         # T series require commission
-        if project.genre.upper() == 'T':
-            return False
+        # 2022.05.08 Allow T series researches because commission is now force to enable
+        # if project.genre.upper() == 'T':
+        #     return False
         # 2021.08.19 Allow E-2 to disassemble tech boxes, but JP still remains the same.
         if self.config.SERVER == 'jp':
             if project.genre.upper() == 'E' and str(project.duration) != '6':
@@ -651,26 +687,26 @@ class ResearchSelector(UI):
 
         return True
 
-    def research_sort_shortest(self):
+    def research_sort_shortest(self, enforce):
         """
         Returns:
             list: A list of ResearchProject objects and preset strings,
                 such as [object, object, object, 'reset']
         """
         FILTER.load(FILTER_STRING_SHORTEST)
-        priority = FILTER.apply(self.projects, func=self._research_check)
+        priority = FILTER.apply(self.projects, func=partial(self._research_check, enforce=enforce))
 
         logger.attr('Filter_sort', ' > '.join([str(project) for project in priority]))
         return priority
 
-    def research_sort_cheapest(self):
+    def research_sort_cheapest(self, enforce):
         """
         Returns:
             list: A list of ResearchProject objects and preset strings,
                 such as [object, object, object, 'reset']
         """
         FILTER.load(FILTER_STRING_CHEAPEST)
-        priority = FILTER.apply(self.projects, func=self._research_check)
+        priority = FILTER.apply(self.projects, func=partial(self._research_check, enforce=enforce))
 
         logger.attr('Filter_sort', ' > '.join([str(project) for project in priority]))
         return priority
