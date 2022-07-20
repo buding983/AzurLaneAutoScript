@@ -497,6 +497,8 @@
       "name": "Event Name",
       "help": "Automatically selects to the latest event",
       "campaign_main": "campaign_main",
+      "event_20200917_cn": "Dreamwakers Butterfly Rerun",
+      "event_20201029_cn": "Universe in Unison",
       "raid_20220630": "Angel of Iris",
       "raid_20210708": "Cross Wave rerun",
       "event_20200820_cn": "Scherzo of Iron and Blood Rerun",
@@ -521,7 +523,6 @@
       "event_20211111_cn": "The Flame-Touched Dagger",
       "event_20211028_tw": "復刻光與影的鳶尾之華",
       "event_20211028_cn": "Skybound Oratorio Rerun",
-      "event_20200917_cn": "Dreamwakers Butterfly",
       "event_20210916_cn": "Upon the Shimmering Blue",
       "event_20210722_cn": "Azur Anthem",
       "event_20210819_cn": "Microlayer Medley Rerun",
@@ -539,7 +540,6 @@
       "event_20210121_cn": "Empyreal Tragicomedy Rerun",
       "event_20201126_cn": "Vacation Lane",
       "event_20200312_cn": "The Solomon Ranger Rerun",
-      "event_20201029_cn": "Universe in Unison",
       "event_20201002_en": "Counterattack Within the Fjord",
       "event_20200716_en": "Ink Stained Steel Sakura Rerun",
       "event_20200611_en": "Skybound Oratorio",
@@ -1120,6 +1120,9 @@
       "name": "Preset Filter Select",
       "help": "See research drops rates and spawn rates in https://azur-stats.lyoko.io/. People without a basic knowledge of these are recommended to use pre-optimized presets instead of writing custom filters",
       "custom": "custom",
+      "series_5_blueprint_152": "Series 5 Blueprints+152",
+      "series_5_blueprint_only": "Series 5 Blueprints Only",
+      "series_5_152_only": "Series 5 152 Only",
       "series_4_blueprint_tenrai": "Series 4 Blueprints+Tenrai",
       "series_4_blueprint_only": "Series 4 Blueprints Only",
       "series_4_tenrai_only": "Series 4 Tenrai Only",
@@ -1535,6 +1538,10 @@
       "8": "8",
       "9": "9",
       "10": "10"
+    },
+    "UseTicket": {
+      "name": "Use Build Ticket(s)",
+      "help": "Use build tickets first for event pool. Use cubes if tickets run out or build general pools"
     },
     "UseDrill": {
       "name": "Use Drill(s)",
@@ -2056,7 +2063,9 @@
     "MenuDevelop": {
       "HomePage": "Home",
       "Translate": "Translate",
-      "Update": "Updater"
+      "Update": "Updater",
+      "Remote": "Remote access",
+      "Utils": "Utils"
     },
     "Overview": {
       "Scheduler": "Scheduler",
@@ -2091,6 +2100,14 @@
       "Message": "Commit message",
       "DisabledWarn": "Updater module is disabled. You need to manually restart Alas to update",
       "DetailedHistory": "Detailed Commit History"
+    },
+    "Remote": {
+      "Running": "Remote access on",
+      "NotRunning": "Not running, server disconnected or offline",
+      "NotEnable": "Disabled, set webui password in deploy.yaml and enable remote access",
+      "EntryPoint": "Entry point:",
+      "ConfigureHint": "Configuration tutorial:",
+      "SSHNotInstall": "No SSH command in your system. Please refer to the tutorial to download or install one"
     },
     "Text": {
       "InvalidFeedBack": "Invalid format. Example: {0}"

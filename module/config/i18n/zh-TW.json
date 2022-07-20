@@ -497,6 +497,8 @@
       "name": "活動名稱",
       "help": "自動選擇至最新的活動圖",
       "campaign_main": "主線圖",
+      "event_20200917_cn": "蝶海夢花",
+      "event_20201029_cn": "激唱的UNIVERSE",
       "raid_20220630": "Angel of Iris",
       "raid_20210708": "復刻穿越彼方的水線",
       "event_20200820_cn": "復刻鐵血音符誓言",
@@ -521,7 +523,6 @@
       "event_20211111_cn": "The Flame-Touched Dagger",
       "event_20211028_tw": "復刻光與影的鳶尾之華",
       "event_20211028_cn": "Skybound Oratorio Rerun",
-      "event_20200917_cn": "蝶海夢花",
       "event_20210916_cn": "Upon the Shimmering Blue",
       "event_20210722_cn": "響徹碧海的偶像歌",
       "event_20210819_cn": "Microlayer Medley Rerun",
@@ -539,7 +540,6 @@
       "event_20210121_cn": "Empyreal Tragicomedy Rerun",
       "event_20201126_cn": "Vacation Lane",
       "event_20200312_cn": "斯圖爾特的硝煙",
-      "event_20201029_cn": "Universe in Unison",
       "event_20201002_en": "Counterattack Within the Fjord",
       "event_20200716_en": "Ink Stained Steel Sakura Rerun",
       "event_20200611_en": "Skybound Oratorio",
@@ -1120,6 +1120,9 @@
       "name": "科研過濾器",
       "help": "科研掉落和項目刷新見 https://azur-stats.lyoko.io/，對這些沒有基本了解的人不建議編寫自定義過濾器，建議使用預優化科研過濾器",
       "custom": "自定義",
+      "series_5_blueprint_152": "五期 藍圖+152",
+      "series_5_blueprint_only": "五期 僅藍圖",
+      "series_5_152_only": "五期 僅152",
       "series_4_blueprint_tenrai": "四期 藍圖+天雷",
       "series_4_blueprint_only": "四期 僅藍圖",
       "series_4_tenrai_only": "四期 僅天雷",
@@ -1535,6 +1538,10 @@
       "8": "8",
       "9": "9",
       "10": "10"
+    },
+    "UseTicket": {
+      "name": "使用單次建造券",
+      "help": "開啓後支持建造券的池將優先使用建造券建造，無建造券及建造一般池時仍使用魔方建造"
     },
     "UseDrill": {
       "name": "使用鑽頭完成建造",
@@ -2056,7 +2063,9 @@
     "MenuDevelop": {
       "HomePage": "主頁",
       "Translate": "翻譯",
-      "Update": "更新器"
+      "Update": "更新器",
+      "Remote": "遠程控制",
+      "Utils": "工具"
     },
     "Overview": {
       "Scheduler": "調度器",
@@ -2091,6 +2100,14 @@
       "Message": "提交資訊",
       "DisabledWarn": "更新模塊未啟用，你需要手動重啓 Alas 進行更新",
       "DetailedHistory": "詳細提交歷史"
+    },
+    "Remote": {
+      "Running": "運行中",
+      "NotRunning": "未運行，与伺服器的連接斷開或伺服器離線",
+      "NotEnable": "未啟用，在 deploy.yaml 中設定 webui 密碼並啟用遠程控制",
+      "EntryPoint": "遠程控制 url 連結:",
+      "ConfigureHint": "配寘教程：",
+      "SSHNotInstall": "系統中沒有 ssh 工具，請參閱教程下載安裝 ssh"
     },
     "Text": {
       "InvalidFeedBack": "格式錯誤。 示例：{0}"

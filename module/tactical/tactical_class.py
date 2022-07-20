@@ -57,7 +57,7 @@ BOOK_FILTER = Filter(
         '(same)?'
         '(red|blue|yellow)?'
         '-?'
-        '(t[123])?'
+        '(t[1234])?'
     ),
     attr=('same_str', 'genre_str', 'tier_str'),
     preset=('first',)
@@ -351,6 +351,7 @@ class RewardTacticalClass(UI):
                     self.interval_clear(TACTICAL_CHECK)
                     if empty_confirm.reached():
                         self.device.click(BACK_ARROW)
+                        empty_confirm.reset()
                         received = True
                         continue
             else:
