@@ -47,7 +47,7 @@ class ConnectionAttr:
                 continue
             if 'oc' in v['type'] and v['value']:
                 count += 1
-        if count >= 3:
+        if count >= 0:
             for k, _ in deep_iter(d, depth=1):
                 if 'proxy' in k[0].split('_')[-1].lower():
                     del os.environ[k[0]]
