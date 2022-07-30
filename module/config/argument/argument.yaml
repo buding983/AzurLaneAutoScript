@@ -147,7 +147,7 @@ Submarine:
     option: [ sub_standby, sub_auto_call ]
   DistanceToBoss:
     value: '2_grid_to_boss'
-    option: [to_boss_position, 1_grid_to_boss, 2_grid_to_boss, use_U522_skill]
+    option: [to_boss_position, 1_grid_to_boss, 2_grid_to_boss, use_open_ocean_support]
 Emotion:
   CalculateEmotion: true
   IgnoreLowEmotionWarn: false
@@ -219,13 +219,9 @@ GemsFarming:
 EventGeneral:
   PtLimit: 0
   TimeLimit: 2020-01-01 00:00:00
-EventAb:
+EventDaily:
   StageFilter: |-
-    A1 > A2 > A3 > B1 > B2 > B3
-  LastStage: 0
-EventCd:
-  StageFilter: |-
-    C1 > C2 > C3 > D1 > D2 > D3
+    A1 > A2 > A3
   LastStage: 0
 Raid:
   Mode:
@@ -279,6 +275,7 @@ Research:
   UsePart:
     value: always_use
     option: [always_use, only_05_hour, only_no_project, do_not_use]
+  AllowDelay: true
   PresetFilter:
     value: series_5_blueprint_152
     option:
@@ -297,12 +294,11 @@ Research:
       - series_2_blueprint_only
       - series_2_457_only
   CustomFilter: |-
-    S4-Q0.5 > Q-0.5 > S4-DR0.5 > S4-PRY0.5 > DR-0.5 > PRY-0.5
-    > S4-Q1 > S4-Q2
-    > S4-DR2.5 > S4-G1.5
-    > S4-Q4 > S4-H0.5 > S4-G4
-    > S4-PRY2.5 > S4-G2.5
-    > reset > S4-H1 > shortest
+    S5-DR0.5 > S5-PRY0.5 > S5-H0.5 > S5-Q0.5 > S5-DR2.5 > 0.5 > S5-G1.5
+    > S5-Q1 > S5-DR5 > S5-DR8 > S5-G4 > S5-PRY2.5 > 1 > S5-Q2 > reset
+    > S5-G2.5 > S5-PRY5 > S5-PRY8 > 1.5 > 2 > S5-Q4 > 2.5 > 3
+    > Q4 > G4 > 4 > 5 > S5-C6 > C6 > 6 > S5-C8 > 8
+    > S5-C12 > 12
 Dorm:
   Collect: true
   Feed: true

@@ -92,7 +92,7 @@ class GeneratedConfig:
     Submarine_Fleet = 0  # 0, 1, 2
     Submarine_Mode = 'do_not_use'  # do_not_use, hunt_only, boss_only, every_combat
     Submarine_AutoSearchMode = 'sub_standby'  # sub_standby, sub_auto_call
-    Submarine_DistanceToBoss = '2_grid_to_boss'  # to_boss_position, 1_grid_to_boss, 2_grid_to_boss, use_U522_skill
+    Submarine_DistanceToBoss = '2_grid_to_boss'  # to_boss_position, 1_grid_to_boss, 2_grid_to_boss, use_open_ocean_support
 
     # Group `Emotion`
     Emotion_CalculateEmotion = True
@@ -147,13 +147,9 @@ class GeneratedConfig:
     EventGeneral_PtLimit = 0
     EventGeneral_TimeLimit = datetime.datetime(2020, 1, 1, 0, 0)
 
-    # Group `EventAb`
-    EventAb_StageFilter = 'A1 > A2 > A3 > B1 > B2 > B3'
-    EventAb_LastStage = 0
-
-    # Group `EventCd`
-    EventCd_StageFilter = 'C1 > C2 > C3 > D1 > D2 > D3'
-    EventCd_LastStage = 0
+    # Group `EventDaily`
+    EventDaily_StageFilter = 'A1 > A2 > A3'
+    EventDaily_LastStage = 0
 
     # Group `Raid`
     Raid_Mode = 'hard'  # easy, normal, hard
@@ -183,8 +179,9 @@ class GeneratedConfig:
     Research_UseCube = 'only_05_hour'  # always_use, only_05_hour, only_no_project, do_not_use
     Research_UseCoin = 'always_use'  # always_use, only_05_hour, only_no_project, do_not_use
     Research_UsePart = 'always_use'  # always_use, only_05_hour, only_no_project, do_not_use
+    Research_AllowDelay = True
     Research_PresetFilter = 'series_5_blueprint_152'  # custom, series_5_blueprint_152, series_5_blueprint_only, series_5_152_only, series_4_blueprint_tenrai, series_4_blueprint_only, series_4_tenrai_only, series_3_blueprint_234, series_3_blueprint_only, series_3_234_only, series_2_than_3_457_234, series_2_blueprint_457, series_2_blueprint_only, series_2_457_only
-    Research_CustomFilter = 'S4-Q0.5 > Q-0.5 > S4-DR0.5 > S4-PRY0.5 > DR-0.5 > PRY-0.5\n> S4-Q1 > S4-Q2\n> S4-DR2.5 > S4-G1.5\n> S4-Q4 > S4-H0.5 > S4-G4\n> S4-PRY2.5 > S4-G2.5\n> reset > S4-H1 > shortest'
+    Research_CustomFilter = 'S5-DR0.5 > S5-PRY0.5 > S5-H0.5 > S5-Q0.5 > S5-DR2.5 > 0.5 > S5-G1.5\n> S5-Q1 > S5-DR5 > S5-DR8 > S5-G4 > S5-PRY2.5 > 1 > S5-Q2 > reset\n> S5-G2.5 > S5-PRY5 > S5-PRY8 > 1.5 > 2 > S5-Q4 > 2.5 > 3\n> Q4 > G4 > 4 > 5 > S5-C6 > C6 > 6 > S5-C8 > 8\n> S5-C12 > 12'
 
     # Group `Dorm`
     Dorm_Collect = True
