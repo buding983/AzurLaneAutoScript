@@ -122,9 +122,8 @@ class RewardResearch(ResearchSelector, ResearchQueue):
                 else:
                     logger.warning(f'Unknown select method: {project}')
                 return True
-            elif project.genre.upper() in ['C', 'T'] and \
-                    self.research_enforce(drop=drop, add_queue=add_queue):
-                return True
+            elif project.genre.upper() in ['C', 'T'] and not self.enforce:
+                return self.research_enforce(drop=drop, add_queue=add_queue)
             else:
                 # priority example: [ResearchProject, ResearchProject,]
                 ret = self.research_project_start(project, add_queue=add_queue)
@@ -260,7 +259,7 @@ class RewardResearch(ResearchSelector, ResearchQueue):
                 else:
                     self.device.screenshot()
 
-                if self.appear(RESEARCH_CHECK, interval=10):
+                if self.appear(RESEARCH_CHECK, offset=(20, 20), interval=10):
                     if self.research_has_finished():
                         self.device.click(RESEARCH_ENTRANCE[self._research_finished_index])
 
@@ -476,6 +475,8 @@ class RewardResearch(ResearchSelector, ResearchQueue):
                 break
             if 'unknown' in status:
                 continue
+            if sum([s == 'detail' for s in status]) == 5:
+                break
 
         return True
 
