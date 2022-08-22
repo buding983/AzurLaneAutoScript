@@ -114,6 +114,9 @@ class RewardCommission(UI, InfoHandler):
         """
         # Count Commission
         total = daily.add_by_eq(urgent)
+        # Commissions with higher suffix are always below those with smaller suffix
+        # Reverse the commission list to choose commissions with higher suffix first
+        total = total[::-1]
         self.max_commission = 4
         for comm in total:
             if comm.genre == 'event_daily':
@@ -457,7 +460,7 @@ class RewardCommission(UI, InfoHandler):
                         click_timer.reset()
                         reward = True
                         continue
-                if click_timer.reached() and self.appear_then_click(REWARD_1, interval=1):
+                if click_timer.reached() and self.appear_then_click(REWARD_1, offset=(20, 20), interval=1):
                     click_timer.reset()
                     reward = True
                     continue
