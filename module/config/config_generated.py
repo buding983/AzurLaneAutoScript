@@ -148,6 +148,7 @@ class GeneratedConfig:
     GemsFarming_VanguardEquipChange = False
     GemsFarming_LowEmotionRetreat = True
     GemsFarming_CommonCV = 'any'  # any, langley, bogue, ranger, hermes
+    GemsFarming_CommissionLimit = True
 
     # Group `EventGeneral`
     EventGeneral_PtLimit = 0
@@ -178,6 +179,7 @@ class GeneratedConfig:
 
     # Group `Tactical`
     Tactical_TacticalFilter = 'SameT4 > SameT3 > SameT2 > SameT1\n> BlueT2 > YellowT2 > RedT2\n> BlueT3 > YellowT3 > RedT3\n> BlueT4 > YellowT4 > RedT4\n> BlueT1 > YellowT1 > RedT1\n> first'
+    Tactical_RapidTrainingSlot = 'do_not_use'  # do_not_use, slot_1, slot_2, slot_3, slot_4
 
     # Group `ControlExpOverflow`
     ControlExpOverflow_Enable = True
@@ -338,8 +340,12 @@ class GeneratedConfig:
 
     # Group `OpsiAshBeacon`
     OpsiAshBeacon_AshAttack = True
-    OpsiAshBeacon_EnsureFullyCollected = True
+    OpsiAshBeacon_OneHitMode = True
     OpsiAshBeacon_RequestAssist = True
+    OpsiAshBeacon_EnsureFullyCollected = True
+
+    # Group `OpsiDossierBeacon`
+    OpsiDossierBeacon_Enable = True
 
     # Group `OpsiFleetFilter`
     OpsiFleetFilter_Filter = 'Fleet-4 > CallSubmarine > Fleet-2 > Fleet-3 > Fleet-1'
