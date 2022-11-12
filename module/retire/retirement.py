@@ -6,6 +6,7 @@ from module.exception import RequestHumanTakeover, ScriptError
 from module.logger import logger
 from module.retire.assets import *
 from module.retire.enhancement import Enhancement
+from module.retire.scanner import ShipScanner
 from module.retire.setting import QuickRetireSettingHandler
 
 CARD_GRIDS = ButtonGrid(
@@ -72,10 +73,12 @@ class Retirement(Enhancement, QuickRetireSettingHandler):
                 SHIP_CONFIRM if using old_retire
             out: IN_RETIREMENT_CHECK
         """
+        logger.info('Retirement confirm')
         executed = False
         backup, self._popup_offset = self._popup_offset, (20, 50)
         for button in [SHIP_CONFIRM, SHIP_CONFIRM_2, EQUIP_CONFIRM, EQUIP_CONFIRM_2, GET_ITEMS_1, SR_SSR_CONFIRM]:
             self.interval_clear(button)
+        timeout = Timer(10, count=10).start()
         while 1:
             if skip_first_screenshot:
                 skip_first_screenshot = False
@@ -83,15 +86,26 @@ class Retirement(Enhancement, QuickRetireSettingHandler):
                 self.device.screenshot()
 
             # End
-            if executed and self.appear(IN_RETIREMENT_CHECK):
-                self.handle_info_bar()
+            if timeout.reached():
+                # Ships being used by GemsFarming have no equipment to disassemble
+                # So `executed` is never set to True, causing infinite loop
+                # Handled with dirty timeout, a better fix is required
+                logger.warning('Wait _retirement_confirm timeout, assume finished')
                 break
+            if self.appear(IN_RETIREMENT_CHECK):
+                if executed:
+                    self.handle_info_bar()
+                    break
+            else:
+                timeout.reset()
 
             # Click
-            if self.appear(SHIP_CONFIRM, offset=(30, 30), interval=2) \
-                    and SHIP_CONFIRM.match_appear_on(self.device.image):
-                self.device.click(SHIP_CONFIRM)
-                continue
+            if self.appear(SHIP_CONFIRM, offset=(30, 30), interval=2):
+                if SHIP_CONFIRM.match_appear_on(self.device.image):
+                    self.device.click(SHIP_CONFIRM)
+                    continue
+                else:
+                    self.interval_clear(SHIP_CONFIRM)
             if self.appear(SHIP_CONFIRM_2, offset=(30, 30), interval=2):
                 if self.config.RETIRE_KEEP_COMMON_CV and not self._have_kept_cv:
                     self.keep_one_common_cv()
@@ -255,6 +269,65 @@ class Retirement(Enhancement, QuickRetireSettingHandler):
         logger.info(f'Total retired: {total}')
         return total
 
+    def retire_gems_farming_flagships(self):
+        """
+        Retire abandoned flagships of GemsFarming.
+        Common CV whose level > 1, fleet is none and status is free
+        will be regarded as targets.
+        """
+        logger.info('Retire abandoned flagships of GemsFarming')
+
+        gems_farming_enable: bool = self.config.cross_get(keys='GemsFarming.Scheduler.Enable', default=False)
+        if not (gems_farming_enable and self.config.GemsFarming_FlagshipChange):
+            logger.info('GemsFarming or GemsFarming_FlagshipChange is not enabled, skip')
+            return 0
+
+        def server_support_flagship_retire() -> bool:
+            return self.config.SERVER in ['cn', 'en']
+
+        if not server_support_flagship_retire():
+            logger.info(f'Server {self.config.SERVER} does not yet support flagships retirement, skip')
+            logger.info('Please contact the developer to improve as soon as possible')
+            return 0
+
+        self.dock_filter_set(index='cv', rarity='common', extra='not_level_max', sort='level')
+        self.dock_favourite_set(False)
+
+        scanner = ShipScanner(
+            rarity='common', fleet=0, status='free', level=(2, 100))
+        scanner.disable('emotion')
+
+        total = 0
+        _ = self._have_kept_cv
+        self._have_kept_cv = True
+
+        skip_first_screenshot = True
+        while 1:
+            if skip_first_screenshot:
+                skip_first_screenshot = False
+            else:
+                self.device.screenshot()
+
+            ships = scanner.scan(self.device.image)
+            if len(ships) < 2:
+                break
+            else:
+                # Try to keep the one with the lowest level
+                ships.sort(key=lambda ship: -ship.level)
+                ships = ships[:-1]
+
+            for ship in ships[:10]:
+                self.device.click(ship.button)
+                self.device.sleep((0.1, 0.15))
+                total += 1
+
+            self._retirement_confirm()
+
+        self._have_kept_cv = _
+        self.dock_filter_set()
+
+        return total
+
     def handle_retirement(self):
         """
         Returns:
@@ -339,6 +412,7 @@ class Retirement(Enhancement, QuickRetireSettingHandler):
                 #     logger.warning('No ship retired, trying to reset quick retire settings to "all"')
                 #     self.quick_retire_setting_set('all')
                 #     total = self.retire_ships_one_click()
+            total += self.retire_gems_farming_flagships()
             if not total:
                 logger.critical('No ship retired')
                 logger.critical('Please configure your "Quick Retire Options" in game, '
@@ -347,6 +421,7 @@ class Retirement(Enhancement, QuickRetireSettingHandler):
         elif mode == 'old_retire':
             self.handle_dock_cards_loading()
             total = self.retire_ships_old()
+            total += self.retire_gems_farming_flagships()
             if not total:
                 logger.critical('No ship retired')
                 logger.critical('Please configure your retirement settings in Alas, '
