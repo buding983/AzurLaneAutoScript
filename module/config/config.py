@@ -115,7 +115,7 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig, ConfigWatcher
 
     def load(self):
         self.data = self.read_file(self.config_name)
-        #self.config_override()
+        self.config_override()
 
         for path, value in self.modified.items():
             deep_set(self.data, keys=path, value=value)
@@ -272,13 +272,13 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig, ConfigWatcher
                 if isinstance(next_run, datetime) and next_run > limit:
                     deep_set(self.data, keys=f"{task}.Scheduler.NextRun", value=now)
 
-        for task in ["Commission", "Research", "Reward"]:
-            enable = deep_get(
-                self.data, keys=f"{task}.Scheduler.Enable", default=None
-            )
-            if enable is not None and not enable:
-                self.modified[f"{task}.Scheduler.Enable"] = True
-        force_enable = list
+        #for task in ["Commission", "Research", "Reward"]:
+        #    enable = deep_get(
+        #        self.data, keys=f"{task}.Scheduler.Enable", default=None
+        #    )
+        #    if enable is not None and not enable:
+        #        self.modified[f"{task}.Scheduler.Enable"] = True
+        #force_enable = list
 
         #force_enable(
         #    [
