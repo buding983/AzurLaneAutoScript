@@ -3,6 +3,7 @@ from module.base.timer import Timer
 from module.base.utils import color_similar, get_color, resize
 from module.combat.assets import GET_ITEMS_1
 from module.exception import RequestHumanTakeover, ScriptError
+from module.handler.assets import AUTO_SEARCH_MAP_OPTION_OFF, AUTO_SEARCH_MAP_OPTION_ON
 from module.logger import logger
 from module.retire.assets import *
 from module.retire.enhancement import Enhancement
@@ -75,7 +76,6 @@ class Retirement(Enhancement, QuickRetireSettingHandler):
         """
         logger.info('Retirement confirm')
         executed = False
-        backup, self._popup_offset = self._popup_offset, (20, 50)
         for button in [SHIP_CONFIRM, SHIP_CONFIRM_2, EQUIP_CONFIRM, EQUIP_CONFIRM_2, GET_ITEMS_1, SR_SSR_CONFIRM]:
             self.interval_clear(button)
         timeout = Timer(10, count=10).start()
@@ -126,13 +126,11 @@ class Retirement(Enhancement, QuickRetireSettingHandler):
                     or self.config.Retirement_OldRetireSR \
                     or self.config.Retirement_OldRetireSSR \
                     or self.config.Retirement_RetireMode == 'one_click_retire':
-                if self.handle_popup_confirm('RETIRE_SR_SSR'):
+                if self.handle_popup_confirm(name='RETIRE_SR_SSR', offset=(20, 50)):
                     continue
                 if self.config.SERVER in ['cn', 'jp', 'tw'] and \
-                        self.appear_then_click(SR_SSR_CONFIRM, offset=self._popup_offset, interval=2):
+                        self.appear_then_click(SR_SSR_CONFIRM, offset=(20, 50), interval=2):
                     continue
-
-        self._popup_offset = backup
 
     def retirement_appear(self):
         return self.appear(RETIRE_APPEAR_1, offset=30) \
@@ -283,7 +281,7 @@ class Retirement(Enhancement, QuickRetireSettingHandler):
             return 0
 
         def server_support_flagship_retire() -> bool:
-            return self.config.SERVER in ['cn', 'en']
+            return self.config.SERVER in ['cn', 'en', 'jp']
 
         if not server_support_flagship_retire():
             logger.info(f'Server {self.config.SERVER} does not yet support flagships retirement, skip')
@@ -340,6 +338,7 @@ class Retirement(Enhancement, QuickRetireSettingHandler):
         if self._unable_to_enhance:
             if self.appear_then_click(RETIRE_APPEAR_1, offset=(20, 20), interval=3):
                 self.interval_clear(IN_RETIREMENT_CHECK)
+                self.interval_reset([AUTO_SEARCH_MAP_OPTION_OFF, AUTO_SEARCH_MAP_OPTION_ON])
                 return False
             if self.appear(IN_RETIREMENT_CHECK, offset=(20, 20), interval=10):
                 self._retire_handler(mode='one_click_retire')
@@ -349,6 +348,7 @@ class Retirement(Enhancement, QuickRetireSettingHandler):
         elif self.config.Retirement_RetireMode == 'enhance':
             if self.appear_then_click(RETIRE_APPEAR_3, offset=(20, 20), interval=3):
                 self.interval_clear(DOCK_CHECK)
+                self.interval_reset([AUTO_SEARCH_MAP_OPTION_OFF, AUTO_SEARCH_MAP_OPTION_ON])
                 return False
             if self.appear(DOCK_CHECK, offset=(20, 20), interval=10):
                 self.handle_dock_cards_loading()
@@ -366,6 +366,7 @@ class Retirement(Enhancement, QuickRetireSettingHandler):
         else:
             if self.appear_then_click(RETIRE_APPEAR_1, offset=(20, 20), interval=3):
                 self.interval_clear(IN_RETIREMENT_CHECK)
+                self.interval_reset([AUTO_SEARCH_MAP_OPTION_OFF, AUTO_SEARCH_MAP_OPTION_ON])
                 return False
             if self.appear(IN_RETIREMENT_CHECK, offset=(20, 20), interval=10):
                 self._retire_handler()

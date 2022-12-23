@@ -29,6 +29,8 @@ To add a new event, add a new row in here, and run `python -m module.config.conf
 | 20220721   | war archives 20210624 cn | Swirling Cherry Blossoms        | 浮樱影华        | Swirling Cherry Blossoms             | 翳りし満ちる影の華          | -                    |
 | 20220901   | war archives 20200806 cn | The Enigma and the Shark        | 最重要的宝物      | The Enigma and the Shark             | 鉄血鮫とエニグマ           | -                    |
 | 20221013   | war archives 20201029 cn | Universe in Unison              | 激唱的UNIVERSE | Universe in Unison                   | 激唱のユニバース           | -                    |
+| 20221117   | war archives 20200903 cn | Stars of the Shimmering Fjord   | 峡湾间的星辰     | Stars of the Shimmering Fjord       | 輝ける峡湾の星            | -                    |
+| 20221117   | war archives 20210819 cn | Microlayer Medley               | 微层混合       | Microlayer Medley                   | 闇靄払う銀翼              | -                    |
 | 20200227   | event 20200227 cn        | Northern Overture               | 北境序曲        | Northern Overture                    | 凍絶の北海              | -                    |
 | 20200312   | event 20200312 cn        | The Solomon Ranger              | 复刻斯图尔特的硝烟   | The Solomon Ranger Rerun             | 南洋に靡く硝煙（復刻）        | -                    |
 | 20200326   | event 20200326 cn        | Microlayer Medley               | 微层混合        | Microlayer Medley                    | 闇靄払う銀翼             | -                    |
@@ -119,3 +121,6 @@ To add a new event, add a new row in here, and run `python -m module.config.conf
 | 20221110   | event 20201229 cn        | Inverted Orthant                | 复刻负象限作战     | Inverted Orthant Rerun                   | 虚畳なりし限象（復刻）            | -                    |
 | 20221117   | event 20210325 cn        | Ashen Simulacrum                | -           | -                                    | -                  | 復刻箱庭療法   |
 | 20221124   | event 20221124 cn        | The Alchemist and the Archipelago of Secrets | 炼金术士与秘密遗迹群岛 | The Alchemist and the Archipelago of Secrets | 錬金術士と謎の遺跡群島 | - |
+| 20221201   | event 20221124 cn        | The Alchemist and the Archipelago of Secrets | -           | -                                    | -                  | 鍊金術士與秘密遺跡群島 |
+| 20221222   | event 20221222 cn        | Parallel Superimposition        | 定向折叠     | Parallel Superimposition | 積重なる事象の幻界             | -                    |
+| 20221222   | event 20211229 cn        | Tower of Transcendence          | -           | -                                    | -                  | 逆轉彩虹之塔 |

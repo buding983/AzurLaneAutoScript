@@ -53,11 +53,15 @@
       "OpsiAshAssist",
       "OpsiExplore",
       "OpsiShop",
+      "OpsiVoucher",
       "OpsiDaily",
       "OpsiObscure",
       "OpsiAbyssal",
+      "OpsiArchive",
       "OpsiStronghold",
-      "OpsiMeowfficerFarming"
+      "OpsiMeowfficerFarming",
+      "OpsiHazard1Leveling",
+      "OpsiCrossMonth"
     ],
     "Tool": [
       "Daemon",
