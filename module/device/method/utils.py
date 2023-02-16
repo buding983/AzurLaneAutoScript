@@ -88,6 +88,10 @@ class PackageNotInstalled(Exception):
     pass
 
 
+class ImageTruncated(Exception):
+    pass
+
+
 def retry_sleep(trial):
     # First trial
     if trial == 0:
@@ -136,6 +140,11 @@ def handle_adb_error(e):
         # In many cases, such as disconnection and recovery caused by network fluctuations,
         # or after VMOS reboot when running Alas on a phone,
         # the device is still available, but it needs to be disconnected and re-connected.
+        logger.error(e)
+        return True
+    elif 'is offline' in text:
+        # RuntimeError: USB device 127.0.0.1:7555 is offline
+        # Raised by uiautomator2 when current adb service is killed by another version of adb service.
         logger.error(e)
         return True
     elif 'unknown host service' in text:

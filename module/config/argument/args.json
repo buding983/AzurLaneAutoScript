@@ -100,14 +100,16 @@
       },
       "ScreenshotMethod": {
         "type": "select",
-        "value": "ADB_nc",
+        "value": "auto",
         "option": [
+          "auto",
           "ADB",
           "ADB_nc",
           "uiautomator2",
           "aScreenCap",
           "aScreenCap_nc",
           "DroidCast",
+          "DroidCast_raw",
           "scrcpy"
         ]
       },
@@ -118,7 +120,8 @@
           "ADB",
           "uiautomator2",
           "minitouch",
-          "Hermit"
+          "Hermit",
+          "MaaTouch"
         ]
       },
       "ScreenshotDedithering": {
@@ -1573,6 +1576,8 @@
         "value": "campaign_main",
         "option": [
           "campaign_main",
+          "event_20220224_cn",
+          "event_20200806_cn",
           "event_20210610_tw",
           "event_20210225_cn",
           "event_20211229_cn",
@@ -1601,13 +1606,11 @@
           "event_20210422_cn",
           "event_20220310_tw",
           "event_20200603_cn",
-          "event_20220224_cn",
           "event_20220210_cn",
           "event_20211125_cn",
           "event_20211028_tw",
           "event_20210722_cn",
           "event_20210819_cn",
-          "event_20200806_cn",
           "event_20200723_cn",
           "event_20210624_cn",
           "event_20210624_tw",
@@ -1629,7 +1632,7 @@
           "event_20200227_cn"
         ],
         "display": "hide",
-        "tw": "event_20210610_tw",
+        "tw": "event_20220224_cn",
         "cn": "event_20210225_cn",
         "en": "event_20210225_cn",
         "jp": "event_20210225_cn"
@@ -2013,6 +2016,8 @@
         "type": "select",
         "value": "campaign_main",
         "option": [
+          "event_20220224_cn",
+          "event_20200806_cn",
           "event_20210610_tw",
           "event_20210225_cn",
           "event_20211229_cn",
@@ -2041,13 +2046,11 @@
           "event_20210422_cn",
           "event_20220310_tw",
           "event_20200603_cn",
-          "event_20220224_cn",
           "event_20220210_cn",
           "event_20211125_cn",
           "event_20211028_tw",
           "event_20210722_cn",
           "event_20210819_cn",
-          "event_20200806_cn",
           "event_20200723_cn",
           "event_20210624_cn",
           "event_20210624_tw",
@@ -2069,7 +2072,7 @@
           "event_20200227_cn"
         ],
         "display": "disabled",
-        "tw": "event_20210610_tw",
+        "tw": "event_20220224_cn",
         "cn": "event_20210225_cn",
         "en": "event_20210225_cn",
         "jp": "event_20210225_cn"
@@ -2444,6 +2447,8 @@
         "type": "select",
         "value": "campaign_main",
         "option": [
+          "event_20220224_cn",
+          "event_20200806_cn",
           "event_20210610_tw",
           "event_20210225_cn",
           "event_20211229_cn",
@@ -2472,13 +2477,11 @@
           "event_20210422_cn",
           "event_20220310_tw",
           "event_20200603_cn",
-          "event_20220224_cn",
           "event_20220210_cn",
           "event_20211125_cn",
           "event_20211028_tw",
           "event_20210722_cn",
           "event_20210819_cn",
-          "event_20200806_cn",
           "event_20200723_cn",
           "event_20210624_cn",
           "event_20210624_tw",
@@ -2500,7 +2503,7 @@
           "event_20200227_cn"
         ],
         "display": "disabled",
-        "tw": "event_20210610_tw",
+        "tw": "event_20220224_cn",
         "cn": "event_20210225_cn",
         "en": "event_20210225_cn",
         "jp": "event_20210225_cn"
@@ -2886,6 +2889,8 @@
         "type": "select",
         "value": "campaign_main",
         "option": [
+          "event_20220224_cn",
+          "event_20200806_cn",
           "event_20210610_tw",
           "event_20210225_cn",
           "event_20211229_cn",
@@ -2914,13 +2919,11 @@
           "event_20210422_cn",
           "event_20220310_tw",
           "event_20200603_cn",
-          "event_20220224_cn",
           "event_20220210_cn",
           "event_20211125_cn",
           "event_20211028_tw",
           "event_20210722_cn",
           "event_20210819_cn",
-          "event_20200806_cn",
           "event_20200723_cn",
           "event_20210624_cn",
           "event_20210624_tw",
@@ -2942,7 +2945,7 @@
           "event_20200227_cn"
         ],
         "display": "disabled",
-        "tw": "event_20210610_tw",
+        "tw": "event_20220224_cn",
         "cn": "event_20210225_cn",
         "en": "event_20210225_cn",
         "jp": "event_20210225_cn"
@@ -3334,6 +3337,8 @@
         "type": "select",
         "value": "campaign_main",
         "option": [
+          "event_20220224_cn",
+          "event_20200806_cn",
           "event_20210610_tw",
           "event_20210225_cn",
           "event_20211229_cn",
@@ -3362,13 +3367,11 @@
           "event_20210422_cn",
           "event_20220310_tw",
           "event_20200603_cn",
-          "event_20220224_cn",
           "event_20220210_cn",
           "event_20211125_cn",
           "event_20211028_tw",
           "event_20210722_cn",
           "event_20210819_cn",
-          "event_20200806_cn",
           "event_20200723_cn",
           "event_20210624_cn",
           "event_20210624_tw",
@@ -3390,7 +3393,7 @@
           "event_20200227_cn"
         ],
         "display": "disabled",
-        "tw": "event_20210610_tw",
+        "tw": "event_20220224_cn",
         "cn": "event_20210225_cn",
         "en": "event_20210225_cn",
         "jp": "event_20210225_cn"
@@ -3782,6 +3785,8 @@
         "type": "select",
         "value": "campaign_main",
         "option": [
+          "event_20220224_cn",
+          "event_20200806_cn",
           "event_20210610_tw",
           "event_20210225_cn",
           "event_20211229_cn",
@@ -3810,13 +3815,11 @@
           "event_20210422_cn",
           "event_20220310_tw",
           "event_20200603_cn",
-          "event_20220224_cn",
           "event_20220210_cn",
           "event_20211125_cn",
           "event_20211028_tw",
           "event_20210722_cn",
           "event_20210819_cn",
-          "event_20200806_cn",
           "event_20200723_cn",
           "event_20210624_cn",
           "event_20210624_tw",
@@ -3838,7 +3841,7 @@
           "event_20200227_cn"
         ],
         "display": "disabled",
-        "tw": "event_20210610_tw",
+        "tw": "event_20220224_cn",
         "cn": "event_20210225_cn",
         "en": "event_20210225_cn",
         "jp": "event_20210225_cn"
@@ -4230,6 +4233,8 @@
         "type": "select",
         "value": "campaign_main",
         "option": [
+          "event_20220224_cn",
+          "event_20200806_cn",
           "event_20210610_tw",
           "event_20210225_cn",
           "event_20211229_cn",
@@ -4258,13 +4263,11 @@
           "event_20210422_cn",
           "event_20220310_tw",
           "event_20200603_cn",
-          "event_20220224_cn",
           "event_20220210_cn",
           "event_20211125_cn",
           "event_20211028_tw",
           "event_20210722_cn",
           "event_20210819_cn",
-          "event_20200806_cn",
           "event_20200723_cn",
           "event_20210624_cn",
           "event_20210624_tw",
@@ -4286,7 +4289,7 @@
           "event_20200227_cn"
         ],
         "display": "disabled",
-        "tw": "event_20210610_tw",
+        "tw": "event_20220224_cn",
         "cn": "event_20210225_cn",
         "en": "event_20210225_cn",
         "jp": "event_20210225_cn"
@@ -4668,6 +4671,8 @@
         "type": "select",
         "value": "campaign_main",
         "option": [
+          "event_20220224_cn",
+          "event_20200806_cn",
           "event_20210610_tw",
           "event_20210225_cn",
           "event_20211229_cn",
@@ -4696,13 +4701,11 @@
           "event_20210422_cn",
           "event_20220310_tw",
           "event_20200603_cn",
-          "event_20220224_cn",
           "event_20220210_cn",
           "event_20211125_cn",
           "event_20211028_tw",
           "event_20210722_cn",
           "event_20210819_cn",
-          "event_20200806_cn",
           "event_20200723_cn",
           "event_20210624_cn",
           "event_20210624_tw",
@@ -4724,7 +4727,7 @@
           "event_20200227_cn"
         ],
         "display": "disabled",
-        "tw": "event_20210610_tw",
+        "tw": "event_20220224_cn",
         "cn": "event_20210225_cn",
         "en": "event_20210225_cn",
         "jp": "event_20210225_cn"
@@ -5104,7 +5107,8 @@
         "option": [
           "easy",
           "normal",
-          "hard"
+          "hard",
+          "ex"
         ]
       },
       "UseTicket": {
@@ -5599,10 +5603,6 @@
       }
     },
     "Commission": {
-      "DoMajorCommission": {
-        "type": "checkbox",
-        "value": false
-      },
       "PresetFilter": {
         "type": "select",
         "value": "cube",
@@ -5618,6 +5618,10 @@
       "CustomFilter": {
         "type": "textarea",
         "value": "DailyEvent > Gem-4 > Gem-2 > Gem-8 > ExtraCube-0:30\n> UrgentCube-1:30 > UrgentCube-1:45 > UrgentCube-3\n> ExtraDrill-5:20 > ExtraDrill-2 > ExtraDrill-3:20\n> UrgentCube-2:15 > UrgentCube-4\n> ExtraDrill-1 > UrgentCube-6 > ExtraCube-1:30\n> ExtraDrill-2:40 > ExtraDrill-0:20\n> Major > DailyChip > DailyResource\n> ExtraPart-0:30 > ExtraOil-1 > UrgentBox-6\n> ExtraCube-3 > ExtraPart-1 > UrgentBox-3\n> ExtraCube-4 > ExtraPart-1:30 > ExtraOil-4\n> UrgentBox-1 > ExtraCube-5 > UrgentBox-1\n> ExtraCube-8 > ExtraOil-8\n> UrgentDrill-4 > UrgentDrill-2:40 > UrgentDrill-2\n> UrgentDrill-1 > UrgentDrill-1:30 > UrgentDrill-1:10\n> Extra-0:20 > Extra-0:30 > Extra-1:00 > Extra-1:30 > Extra-2:00\n> shortest"
+      },
+      "DoMajorCommission": {
+        "type": "checkbox",
+        "value": false
       }
     },
     "Storage": {
@@ -6446,14 +6450,54 @@
         "display": "hide"
       }
     },
-    "Shipyard": {
+    "ShipyardDr": {
       "ResearchSeries": {
-        "type": "input",
-        "value": 1
+        "type": "select",
+        "value": 2,
+        "option": [
+          2
+        ]
       },
       "ShipIndex": {
+        "type": "select",
+        "value": 0,
+        "option": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      "BuyAmount": {
         "type": "input",
-        "value": 0
+        "value": 2
+      }
+    },
+    "Shipyard": {
+      "ResearchSeries": {
+        "type": "select",
+        "value": 1,
+        "option": [
+          1,
+          2,
+          3
+        ]
+      },
+      "ShipIndex": {
+        "type": "select",
+        "value": 0,
+        "option": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
       },
       "BuyAmount": {
         "type": "input",
@@ -8028,7 +8072,7 @@
     "OpsiVoucher": {
       "Filter": {
         "type": "textarea",
-        "value": "LoggerAbyssal > LoggerObscure > HECombatPlan > Book > Coin"
+        "value": "LoggerAbyssal > LoggerObscure > Book > Coin"
       }
     },
     "Storage": {
@@ -8624,37 +8668,27 @@
   },
   "Benchmark": {
     "Benchmark": {
-      "AdbScreenshot": {
-        "type": "checkbox",
-        "value": true
+      "DeviceType": {
+        "type": "select",
+        "value": "emulator",
+        "option": [
+          "emulator",
+          "emulator_android_12",
+          "plone_cloud_with_adb",
+          "phone_cloud_without_adb",
+          "android_phone",
+          "android_phone_12",
+          "android_phone_vmos"
+        ]
       },
-      "AdbncScreenshot": {
-        "type": "checkbox",
-        "value": true
-      },
-      "Uiautomator2Screenshot": {
-        "type": "checkbox",
-        "value": true
-      },
-      "AscreencapScreenshot": {
-        "type": "checkbox",
-        "value": true
-      },
-      "AscreencapncScreenshot": {
-        "type": "checkbox",
-        "value": true
-      },
-      "AdbClick": {
-        "type": "checkbox",
-        "value": true
-      },
-      "Uiautomator2Click": {
-        "type": "checkbox",
-        "value": true
-      },
-      "MinitouchClick": {
-        "type": "checkbox",
-        "value": true
+      "TestScene": {
+        "type": "select",
+        "value": "screenshot_click",
+        "option": [
+          "screenshot_click",
+          "screenshot",
+          "click"
+        ]
       }
     },
     "Storage": {

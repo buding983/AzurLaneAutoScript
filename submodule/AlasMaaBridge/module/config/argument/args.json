@@ -409,6 +409,10 @@
       }
     },
     "MaaFightWeekly": {
+      "Enable": {
+        "type": "checkbox",
+        "value": true
+      },
       "Monday": {
         "type": "select",
         "value": "default",
@@ -892,15 +896,64 @@
       }
     }
   },
+  "MaaReclamationAlgorithm": {
+    "Scheduler": {
+      "Enable": {
+        "type": "checkbox",
+        "value": false
+      },
+      "NextRun": {
+        "type": "datetime",
+        "value": "2020-01-01 04:00:00",
+        "validate": "datetime"
+      },
+      "Command": {
+        "type": "input",
+        "value": "MaaReclamationAlgorithm",
+        "display": "hide"
+      },
+      "SuccessInterval": {
+        "type": "input",
+        "value": 60,
+        "display": "hide"
+      },
+      "FailureInterval": {
+        "type": "input",
+        "value": 120,
+        "display": "hide"
+      },
+      "ServerUpdate": {
+        "type": "input",
+        "value": "04:00",
+        "display": "hide"
+      }
+    },
+    "Storage": {
+      "Storage": {
+        "type": "storage",
+        "value": {},
+        "valuetype": "ignore",
+        "display": "disabled"
+      }
+    }
+  },
   "MaaCopilot": {
     "MaaCopilot": {
       "FileName": {
         "type": "textarea",
         "value": null
       },
+      "Identify": {
+        "type": "checkbox",
+        "value": false
+      },
       "Formation": {
         "type": "checkbox",
         "value": false
+      },
+      "Cycle": {
+        "type": "input",
+        "value": 1
       }
     },
     "Storage": {

@@ -303,6 +303,12 @@ class OperationSiren(OSMap):
                 OpsiGeneral_DoRandomMapEvent=True,
                 OpsiGeneral_AkashiShopFilter='ActionPoint',
             )
+            cd = self.nearest_task_cooling_down
+            logger.attr('Task cooling down', cd)
+            if cd is not None:
+                logger.info(f'Having task cooling down, delay OpsiMeowfficerFarming after it')
+                self.config.task_delay(target=cd.next_run)
+                self.config.task_stop()
         if self.is_in_opsi_explore():
             logger.warning(f'OpsiExplore is still running, cannot do {self.config.task.command}')
             self.config.task_delay(server_update=True)
@@ -408,7 +414,7 @@ class OperationSiren(OSMap):
             if self.config.OpsiHazard1Leveling_TargetZone != 0:
                 zone = self.config.OpsiHazard1Leveling_TargetZone
             else:
-                zone = 44
+                zone = 22
             logger.hr(f'OS hazard 1 leveling, zone_id={zone}', level=1)
             if self.zone.zone_id != zone or not self.is_zone_name_hidden:
                 self.globe_goto(self.name_to_zone(zone), types='SAFE', refresh=True)
@@ -452,6 +458,7 @@ class OperationSiren(OSMap):
             logger.info('To run again, clear OpsiExplore.Scheduler.NextRun and set OpsiExplore.OpsiExplore.LastZone=0')
             with self.config.multi_set():
                 self.config.OpsiExplore_LastZone = 0
+                self.config.OpsiExplore_SpecialRadar = False
                 self.config.task_delay(target=next_reset)
                 self.config.task_call('OpsiDaily', force_call=False)
                 self.config.task_call('OpsiShop', force_call=False)
@@ -616,6 +623,11 @@ class OperationSiren(OSMap):
         Run on weekly basis, AL devs seemingly add new logger
         archives after random scheduled maintenances
         """
+        if self.is_in_opsi_explore():
+            logger.info('OpsiExplore is under scheduling, stop OpsiArchive')
+            self.config.task_delay(server_update=True)
+            self.config.task_stop()
+
         shop = VoucherShop(self.config, self.device)
         while 1:
             # In case logger bought manually,
@@ -757,8 +769,12 @@ class OperationSiren(OSMap):
             ActionPointLimit
             TaskEnd: if no more month boss
         """
-        logger.hr("OS clear Month Boss", level=1)
+        if self.is_in_opsi_explore():
+            logger.info('OpsiExplore is under scheduling, stop OpsiMonthBoss')
+            self.config.task_delay(server_update=True)
+            self.config.task_stop()
 
+        logger.hr("OS clear Month Boss", level=1)
         logger.hr("Month Boss precheck", level=2)
         self.os_mission_enter()
         logger.attr('OpsiMonthBoss.Mode', self.config.OpsiMonthBoss_Mode)
@@ -771,7 +787,7 @@ class OperationSiren(OSMap):
         else:
             logger.info("No Normal/Hard boss found, stop")
             self.os_mission_quit()
-            self.month_boss_delay(is_normal=False, result=True)
+            self.month_boss_delay(is_normal=False, result=False)
             return True
         self.os_mission_quit()
 
@@ -830,7 +846,8 @@ class OperationSiren(OSMap):
                 self.config.task_delay(target=next_reset)
                 self.config.task_stop()
             else:
-                logger.info("Unable to clear the hard monthly boss, task stop")
+                logger.info("Unable to clear the hard monthly boss, try again on tomorrow")
+                self.config.task_delay(server_update=True)
                 self.config.task_stop()
 
 

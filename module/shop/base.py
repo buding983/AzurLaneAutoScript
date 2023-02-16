@@ -5,7 +5,7 @@ from module.base.button import ButtonGrid
 from module.base.decorator import cached_property
 from module.base.filter import Filter
 from module.base.timer import Timer
-from module.combat.assets import GET_ITEMS_1, GET_SHIP
+from module.combat.assets import GET_ITEMS_1, GET_SHIP, GET_ITEMS_3
 from module.logger import logger
 from module.shop.assets import *
 from module.shop.shop_select_globals import *
@@ -189,6 +189,9 @@ class ShopBase(ModuleBase):
         if self.appear(GET_ITEMS_1, interval=1):
             self.device.click(SHOP_CLICK_SAFE_AREA)
             return True
+        if self.appear(GET_ITEMS_3, interval=1):
+            self.device.click(SHOP_CLICK_SAFE_AREA)
+            return True
 
         return False
 
@@ -220,6 +223,13 @@ class ShopBase(ModuleBase):
             if self.shop_obstruct_handle():
                 timeout.reset()
                 continue
+
+            if self.config.SHOP_EXTRACT_TEMPLATE:
+                if self.shop_template_folder:
+                    logger.info(f'Extract item templates to {self.shop_template_folder}')
+                    shop_items.extract_template(self.device.image, self.shop_template_folder)
+                else:
+                    logger.warning('SHOP_EXTRACT_TEMPLATE enabled but shop_template_folder is not set, skip extracting')
 
             shop_items.predict(
                 self.device.image,

@@ -388,13 +388,15 @@
     },
     "ScreenshotMethod": {
       "name": "模拟器截图方案",
-      "help": "速度: aScreenCap_nc > ADB_nc >>> aScreenCap > uiautomator2 ~= ADB\n运行 工具 - 性能测试 以寻找最快的方案",
+      "help": "使用自动选择时，将执行一次性能测试并自动更改为最快的截图方案\n一般情况下的速度: DroidCast_raw >> aScreenCap_nc > ADB_nc >>> aScreenCap > uiautomator2 ~= ADB\n运行 工具 - 性能测试 以寻找最快的方案",
+      "auto": "自动选择最快的",
       "ADB": "ADB",
       "ADB_nc": "ADB_nc",
       "uiautomator2": "uiautomator2",
       "aScreenCap": "aScreenCap",
       "aScreenCap_nc": "aScreenCap_nc",
       "DroidCast": "DroidCast",
+      "DroidCast_raw": "DroidCast_raw",
       "scrcpy": "scrcpy"
     },
     "ControlMethod": {
@@ -403,7 +405,8 @@
       "ADB": "ADB",
       "uiautomator2": "uiautomator2",
       "minitouch": "minitouch",
-      "Hermit": "Hermit"
+      "Hermit": "Hermit",
+      "MaaTouch": "MaaTouch"
     },
     "ScreenshotDedithering": {
       "name": "去除图片色彩抖动",
@@ -612,6 +615,8 @@
       "name": "活动名称",
       "help": "自动选择至最新的活动",
       "campaign_main": "主线图",
+      "event_20220224_cn": "深度回音",
+      "event_20200806_cn": "复刻最重要的宝物",
       "raid_20220127": "演习神秘事件调查",
       "raid_20230118": "冬日的寻路人",
       "event_20210610_tw": "復刻夜幕下的歸途",
@@ -646,13 +651,11 @@
       "event_20210422_cn": "复兴的赞美诗",
       "event_20220310_tw": "復刻斯圖爾特的硝煙",
       "event_20200603_cn": "复刻峡湾间的反击",
-      "event_20220224_cn": "深度回音",
       "event_20220210_cn": "复刻北境序曲",
       "event_20211125_cn": "交汇世界的弧光",
       "event_20211028_tw": "復刻光與影的鳶尾之華",
       "event_20210722_cn": "响彻碧海的偶像歌",
       "event_20210819_cn": "复刻微层混合",
-      "event_20200806_cn": "复刻最重要的宝物",
       "event_20200723_cn": "永夜幻光",
       "event_20210624_cn": "复刻浮樱影华",
       "event_20210624_tw": "穹頂下的聖詠曲",
@@ -742,7 +745,7 @@
       "threat_safe_without_3_stars": "100%通关 + 安全海域"
     },
     "StageIncrease": {
-      "name": "达成关卡成就后前往下一关卡，不停止",
+      "name": "达成关卡成就后向前开荒",
       "help": "自动开荒，需要保证队伍有足够的强度，需要保证队伍满足关卡属性限制，并设置\"达成关卡成就后停止\"\n例如，打开本选项，并选择\"地图通关\"，将在关卡100%通关后前往下一关卡\n支持自动开荒的地图：1-1至14-4，A1至A3，B1至B3，C1至C3，D1至D3，SP1至SP4"
     },
     "GetNewShip": {
@@ -1150,7 +1153,8 @@
       "help": "",
       "easy": "简单",
       "normal": "普通",
-      "hard": "困难"
+      "hard": "困难",
+      "ex": "ex"
     },
     "UseTicket": {
       "name": "使用演习券",
@@ -1182,10 +1186,6 @@
       "name": "委托",
       "help": ""
     },
-    "DoMajorCommission": {
-      "name": "做主要委托（1200油/1000油委托）",
-      "help": ""
-    },
     "PresetFilter": {
       "name": "委托过滤器",
       "help": "如果对委托的产出和收益没有足够的了解，不建议编写自定义过滤器，建议使用预优化委托过滤器\n如果24小时运行刷紧急委托功能，应当使用（7x24刷委托）的过滤器\n不推荐在运行刷紧急委托功能的同时使用石油优先过滤器",
@@ -1199,6 +1199,10 @@
     "CustomFilter": {
       "name": "自定义委托过滤器",
       "help": "使用自定义过滤器需将 \"委托过滤器\" 设置为 \"自定义\"，并阅读 https://github.com/LmeSzinc/AzurLaneAutoScript/wiki/filter_string_cn"
+    },
+    "DoMajorCommission": {
+      "name": "做主要委托（1200油/1000油委托）",
+      "help": "1200油委托现在已经过时，收益很低，建议关闭"
     }
   },
   "Tactical": {
@@ -1670,22 +1674,58 @@
       "help": ""
     }
   },
-  "Shipyard": {
+  "ShipyardDr": {
     "_info": {
-      "name": "开发船坞",
-      "help": "每天买一期科研图纸，前两张免费"
+      "name": "彩科研图纸购买设置",
+      "help": "每天买彩科研图纸，彩科研和金科研图纸折扣独立计数，每天可以各白嫖 2 张"
     },
     "ResearchSeries": {
       "name": "科研期数",
-      "help": ""
+      "help": "",
+      "2": "二期科研"
     },
     "ShipIndex": {
       "name": "舰船序号",
-      "help": "从左往右数，从1开始"
+      "help": "从左往右数，从 1 开始",
+      "0": "不购买",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6"
     },
     "BuyAmount": {
       "name": "购买数量",
+      "help": "每天前两张免费"
+    }
+  },
+  "Shipyard": {
+    "_info": {
+      "name": "金科研图纸购买设置",
       "help": ""
+    },
+    "ResearchSeries": {
+      "name": "科研期数",
+      "help": "",
+      "1": "一期科研",
+      "2": "二期科研",
+      "3": "三期科研"
+    },
+    "ShipIndex": {
+      "name": "舰船序号",
+      "help": "从左往右数，从1开始",
+      "0": "不购买",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6"
+    },
+    "BuyAmount": {
+      "name": "购买数量",
+      "help": "每天前两张免费"
     }
   },
   "Gacha": {
@@ -2227,39 +2267,25 @@
   "Benchmark": {
     "_info": {
       "name": "性能测试",
-      "help": "测试哪个截图方案和点击方案速度更快，速度因模拟器和电脑配置而异"
+      "help": "测试哪个截图方案和控制方案速度更快，速度因模拟器和电脑配置而异\n测试完成后，在 \"Alas\" - \"模拟器设置\" 内选择最快的截图和控制方案"
     },
-    "AdbScreenshot": {
-      "name": "测试 ADB 截图",
-      "help": ""
+    "DeviceType": {
+      "name": "设备类型",
+      "help": "",
+      "emulator": "模拟器 安卓<=9",
+      "emulator_android_12": "模拟器 安卓>9",
+      "plone_cloud_with_adb": "云手机 有公网ADB",
+      "phone_cloud_without_adb": "云手机 无公网ADB",
+      "android_phone": "安卓真机 安卓<=9",
+      "android_phone_12": "安卓真机 安卓>9",
+      "android_phone_vmos": "安卓真机VMOS虚拟机"
     },
-    "AdbncScreenshot": {
-      "name": "测试 ADB_nc 截图",
-      "help": ""
-    },
-    "Uiautomator2Screenshot": {
-      "name": "测试 uiautomator2 截图",
-      "help": ""
-    },
-    "AscreencapScreenshot": {
-      "name": "测试 aScreenCap 截图",
-      "help": ""
-    },
-    "AscreencapncScreenshot": {
-      "name": "测试 aScreenCap_nc 截图",
-      "help": ""
-    },
-    "AdbClick": {
-      "name": "测试 ADB 点击",
-      "help": ""
-    },
-    "Uiautomator2Click": {
-      "name": "测试 uiautomator2 点击",
-      "help": ""
-    },
-    "MinitouchClick": {
-      "name": "测试 minitouch 点击",
-      "help": ""
+    "TestScene": {
+      "name": "测试场景",
+      "help": "",
+      "screenshot_click": "截图+点击速度测试",
+      "screenshot": "截图速度测试",
+      "click": "点击速度测试"
     }
   },
   "AzurLaneUncensored": {

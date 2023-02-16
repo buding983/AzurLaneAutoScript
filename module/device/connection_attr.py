@@ -5,7 +5,6 @@ import adbutils
 import uiautomator2 as u2
 from adbutils import AdbClient, AdbDevice
 
-from deploy.utils import DEPLOY_CONFIG, poor_yaml_read
 from module.base.decorator import cached_property
 from module.config.config import AzurLaneConfig
 from module.config.utils import deep_iter
@@ -128,6 +127,12 @@ class ConnectionAttr:
     def is_over_http(self):
         return bool(re.match(r"^https?://", self.serial))
 
+    @cached_property
+    def is_chinac_phone_cloud(self):
+        # Phone cloud with public ADB connection
+        # Serial like xxx.xxx.xxx.xxx:301
+        return bool(re.search(r":30[0-9]$", self.serial))
+
     @staticmethod
     def find_bluestacks4_hyperv(serial):
         """
@@ -179,9 +184,9 @@ class ConnectionAttr:
         logger.info("Reading Realtime adb port")
 
         if serial == "bluestacks5-hyperv":
-            parameter_name = r"bst\.instance\.Nougat64\.status\.adb_port"
+            parameter_name = r"bst\.instance\.(Nougat64|Pie64)\.status\.adb_port"
         else:
-            parameter_name = rf"bst\.instance\.Nougat64_{serial[19:]}\.status.adb_port"
+            parameter_name = rf"bst\.instance\.(Nougat64|Pie64)_{serial[19:]}\.status.adb_port"
 
         try:
             with OpenKey(HKEY_LOCAL_MACHINE, r"SOFTWARE\BlueStacks_nxt") as key:
@@ -203,26 +208,33 @@ class ConnectionAttr:
         if port is None:
             logger.warning(f"Did not match the result: {serial}.")
             raise RequestHumanTakeover
-        port = port.group(1)
+        port = port.group(2)
         logger.info(f"Match to dynamic port: {port}")
         return f"127.0.0.1:{port}"
 
     @cached_property
     def adb_binary(self):
         # Try adb in deploy.yaml
-        config = poor_yaml_read(DEPLOY_CONFIG)
-        if 'AdbExecutable' in config:
-            file = config['AdbExecutable'].replace('\\', '/')
-            if os.path.exists(file):
-                return os.path.abspath(file)
+        from module.webui.setting import State
+        file = State.deploy_config.AdbExecutable
+        file = file.replace('\\', '/')
+        if os.path.exists(file):
+            return os.path.abspath(file)
 
         # Try existing adb.exe
         for file in self.adb_binary_list:
             if os.path.exists(file):
                 return os.path.abspath(file)
 
-        # Use adb.exe in system PATH
-        file = 'adb.exe'
+        # Try adb in python environment
+        import sys
+        file = os.path.join(sys.executable, '../Lib/site-packages/adbutils/binaries/adb.exe')
+        file = os.path.abspath(file).replace('\\', '/')
+        if os.path.exists(file):
+            return file
+
+        # Use adb in system PATH
+        file = 'adb'
         return file
 
     @cached_property

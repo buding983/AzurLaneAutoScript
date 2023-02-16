@@ -8,7 +8,7 @@ import numpy as np
 from PIL import Image
 
 from module.base.decorator import cached_property
-from module.base.timer import Timer, timer
+from module.base.timer import Timer
 from module.base.utils import get_color, image_size, limit_in, save_image
 from module.device.method.adb import Adb
 from module.device.method.ascreencap import AScreenCap
@@ -36,10 +36,10 @@ class Screenshot(Adb, WSA, DroidCast, AScreenCap, Scrcpy):
             'aScreenCap': self.screenshot_ascreencap,
             'aScreenCap_nc': self.screenshot_ascreencap_nc,
             'DroidCast': self.screenshot_droidcast,
+            'DroidCast_raw': self.screenshot_droidcast_raw,
             'scrcpy': self.screenshot_scrcpy,
         }
 
-    @timer
     def screenshot(self):
         """
         Returns:
@@ -198,7 +198,12 @@ class Screenshot(Adb, WSA, DroidCast, AScreenCap, Scrcpy):
                 self.get_orientation()
                 self.image = self._handle_orientated_image(self.image)
                 orientated = True
-                continue
+                width, height = image_size(self.image)
+                if width == 720 and height == 1280:
+                    logger.info('Unable to handle orientated screenshot, continue for now')
+                    return True
+                else:
+                    continue
             elif self.config.Emulator_Serial == 'wsa-0':
                 self.display_resize_wsa(0)
                 return False

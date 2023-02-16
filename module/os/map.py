@@ -7,7 +7,7 @@ from module.base.timer import Timer
 from module.combat.assets import PAUSE
 from module.config.utils import get_os_reset_remain
 from module.exception import CampaignEnd, RequestHumanTakeover
-from module.exception import GameTooManyClickError, GameStuckError
+from module.exception import GameTooManyClickError
 from module.exception import MapWalkError, ScriptError
 from module.exercise.assets import QUIT_CONFIRM, QUIT_RECONFIRM
 from module.handler.login import LoginHandler
@@ -19,7 +19,6 @@ from module.os.globe_camera import GlobeCamera
 from module.os.globe_operation import RewardUncollectedError
 from module.os_handler.assets import AUTO_SEARCH_OS_MAP_OPTION_OFF, \
     AUTO_SEARCH_OS_MAP_OPTION_ON, AUTO_SEARCH_REWARD
-from module.os_handler.shop import OCR_SHOP_YELLOW_COINS
 from module.os_handler.strategic import StrategicSearchHandler
 from module.ui.assets import GOTO_MAIN
 from module.ui.page import page_main, page_os
@@ -138,9 +137,6 @@ class OSMap(OSFleet, Map, GlobeCamera, StrategicSearchHandler):
         if self.is_in_map():
             self.os_map_goto_globe()
         # IN_GLOBE
-        if not self.is_in_globe():
-            logger.warning('Trying to move in globe, but not in os globe map')
-            raise GameStuckError
         # self.ensure_no_zone_pinned()
         self.globe_update()
         self.globe_focus_to(zone)
@@ -375,9 +371,9 @@ class OSMap(OSFleet, Map, GlobeCamera, StrategicSearchHandler):
         if not self.appear(MAP_GOTO_GLOBE_FOG):
             return False
 
-        logger.warn('Triggered stuck fog status, restarting '
-                    'game to resolve and continue '
-                   f'{self.config.task.command}')
+        logger.warning(f'Triggered stuck fog status, restarting '
+                       f'game to resolve and continue '
+                       f'{self.config.task.command}')
 
         # Restart the game manually rather
         # than through 'task_call'
@@ -430,38 +426,6 @@ class OSMap(OSFleet, Map, GlobeCamera, StrategicSearchHandler):
         logger.info(f'Handle after auto search finished, solved={solved}')
         return solved
 
-    @property
-    def is_in_task_explore(self):
-        return self.config.task.command == 'OpsiExplore'
-
-    @property
-    def is_cl1_enabled(self):
-        return self.config.cross_get('OpsiHazard1Leveling.Scheduler.Enable', default=False)
-
-    def get_yellow_coins(self, skip_first_screenshot=True):
-        """
-        Returns:
-            int:
-        """
-        timeout = Timer(2, count=3).start()
-        while 1:
-            if skip_first_screenshot:
-                skip_first_screenshot = False
-            else:
-                self.device.screenshot()
-
-            yellow_coins = OCR_SHOP_YELLOW_COINS.ocr(self.device.image)
-            if timeout.reached():
-                logger.warning('Get yellow coins timeout')
-            if yellow_coins < 100:
-                # OCR may get 0 or 1 when amount is not immediately loaded
-                logger.info('Yellow coins less than 100, assuming it is an ocr error')
-                continue
-            else:
-                break
-
-        return yellow_coins
-
     def cl1_ap_preserve(self):
         """
         Keeping enough startup AP to run CL1.
@@ -483,7 +447,7 @@ class OSMap(OSFleet, Map, GlobeCamera, StrategicSearchHandler):
     def on_auto_search_battle_count_add(self):
         self._auto_search_battle_count += 1
         logger.attr('battle_count', self._auto_search_battle_count)
-        if self.config.task.command == 'OpsiHazard1Leveling':
+        if self.is_in_task_cl1_leveling:
             if self._auto_search_battle_count % 2 == 1:
                 if self._auto_search_round_timer:
                     cost = round(time.time() - self._auto_search_round_timer, 2)
@@ -564,10 +528,18 @@ class OSMap(OSFleet, Map, GlobeCamera, StrategicSearchHandler):
                 # Auto search can not handle siren searching device.
                 continue
 
-    def interrupt_auto_search(self):
+    def interrupt_auto_search(self, skip_first_screenshot=True):
         logger.info('Interrupting auto search')
         while 1:
-            self.device.screenshot()
+            if skip_first_screenshot:
+                skip_first_screenshot = False
+            else:
+                self.device.screenshot()
+
+            # End
+            if self.ui_page_appear(page_main):
+                logger.info('Auto search interrupted')
+                self.config.task_stop()
 
             if self.appear_then_click(AUTO_SEARCH_REWARD, offset=(50, 50), interval=3):
                 continue
@@ -582,10 +554,12 @@ class OSMap(OSFleet, Map, GlobeCamera, StrategicSearchHandler):
                 continue
             if self.ui_additional():
                 continue
-            # End
-            if self.ui_page_appear(page_main):
-                logger.info('Auto search interrupted')
-                self.config.task_stop()
+            if self.handle_map_event():
+                continue
+            if self.handle_battle_status():
+                continue
+            if self.handle_exp_info():
+                continue
 
     def os_auto_search_run(self, drop=None, strategic=False):
         for _ in range(5):
@@ -772,6 +746,11 @@ class OSMap(OSFleet, Map, GlobeCamera, StrategicSearchHandler):
         if 'is_scanning_device' not in self._solved_map_event and grids and grids[0].is_scanning_device:
             grid = grids[0]
             logger.info(f'Found scanning device on {grid}')
+            if self.is_cl1_enabled:
+                logger.info('CL1 leveling enabled, mark scanning device as solved')
+                self._solved_map_event.add('is_scanning_device')
+                return True
+
             self.device.click(grid)
             result = self.wait_until_walk_stable(drop=drop, walk_out_of_step=False,
                                                  confirm_timer=Timer(1.5, count=4))

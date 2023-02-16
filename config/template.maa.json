@@ -104,6 +104,7 @@
       "DrGrandet": false
     },
     "MaaFightWeekly": {
+      "Enable": true,
       "Monday": "default",
       "Tuesday": "default",
       "Wednesday": "default",
@@ -220,10 +221,25 @@
       "Storage": {}
     }
   },
+  "MaaReclamationAlgorithm": {
+    "Scheduler": {
+      "Enable": false,
+      "NextRun": "2020-01-01 04:00:00",
+      "Command": "MaaReclamationAlgorithm",
+      "SuccessInterval": 60,
+      "FailureInterval": 120,
+      "ServerUpdate": "04:00"
+    },
+    "Storage": {
+      "Storage": {}
+    }
+  },
   "MaaCopilot": {
     "MaaCopilot": {
       "FileName": null,
-      "Formation": false
+      "Identify": false,
+      "Formation": false,
+      "Cycle": 1
     },
     "Storage": {
       "Storage": {}

@@ -54,6 +54,10 @@
       "name": "Task.MaaRoguelike.name",
       "help": "Task.MaaRoguelike.help"
     },
+    "MaaReclamationAlgorithm": {
+      "name": "Task.MaaReclamationAlgorithm.name",
+      "help": "Task.MaaReclamationAlgorithm.help"
+    },
     "MaaCopilot": {
       "name": "Task.MaaCopilot.name",
       "help": "Task.MaaCopilot.help"
@@ -230,6 +234,10 @@
     "_info": {
       "name": "MaaFightWeekly._info.name",
       "help": "MaaFightWeekly._info.help"
+    },
+    "Enable": {
+      "name": "MaaFightWeekly.Enable.name",
+      "help": "MaaFightWeekly.Enable.help"
     },
     "Monday": {
       "name": "MaaFight.Stage.name",
@@ -505,9 +513,17 @@
       "name": "MaaCopilot.FileName.name",
       "help": "MaaCopilot.FileName.help"
     },
+    "Identify": {
+      "name": "MaaCopilot.Identify.name",
+      "help": "MaaCopilot.Identify.help"
+    },
     "Formation": {
       "name": "MaaCopilot.Formation.name",
       "help": "MaaCopilot.Formation.help"
+    },
+    "Cycle": {
+      "name": "MaaCopilot.Cycle.name",
+      "help": "MaaCopilot.Cycle.help"
     }
   },
   "Storage": {

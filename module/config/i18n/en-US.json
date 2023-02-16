@@ -388,13 +388,15 @@
     },
     "ScreenshotMethod": {
       "name": "Screenshot Method",
-      "help": "Speed: aScreenCap_nc > ADB_nc >>> aScreenCap > uiautomator2 ~= ADB\nRun Tools - Performance Test to find the fastest method",
+      "help": "When using auto-select, a benchmark will be performed and automatically changed to the fastest screenshot method.\nGeneral speed: DroidCast_raw >> aScreenCap_nc > ADB_nc >>> aScreenCap > uiautomator2 ~= ADB.\nRun Tools - Performance Test to find the fastest method.",
+      "auto": "Auto-select the fastest",
       "ADB": "ADB ",
       "ADB_nc": "ADB_nc",
       "uiautomator2": "uiautomator2",
       "aScreenCap": "aScreenCap",
       "aScreenCap_nc": "aScreenCap_nc",
       "DroidCast": "DroidCast",
+      "DroidCast_raw": "DroidCast_raw",
       "scrcpy": "scrcpy"
     },
     "ControlMethod": {
@@ -403,7 +405,8 @@
       "ADB": "ADB",
       "uiautomator2": "uiautomator2",
       "minitouch": "minitouch",
-      "Hermit": "Hermit"
+      "Hermit": "Hermit",
+      "MaaTouch": "MaaTouch"
     },
     "ScreenshotDedithering": {
       "name": "Image Color De-dithering",
@@ -612,6 +615,8 @@
       "name": "Event Name",
       "help": "Automatically selects to the latest event",
       "campaign_main": "campaign_main",
+      "event_20220224_cn": "Abyssal Refrain",
+      "event_20200806_cn": "The Enigma and the Shark Rerun",
       "raid_20220127": "Mystery Investigation",
       "raid_20230118": "Winter Pathfinder",
       "event_20210610_tw": "復刻夜幕下的歸途",
@@ -646,13 +651,11 @@
       "event_20210422_cn": "Daedalian Hymn",
       "event_20220310_tw": "復刻斯圖爾特的硝煙",
       "event_20200603_cn": "Counterattack Within the Fjord Rerun",
-      "event_20220224_cn": "Abyssal Refrain",
       "event_20220210_cn": "Northern Overture Rerun",
       "event_20211125_cn": "World-spanning Arclight",
       "event_20211028_tw": "復刻光與影的鳶尾之華",
       "event_20210722_cn": "Azur Anthem",
       "event_20210819_cn": "Microlayer Medley Rerun",
-      "event_20200806_cn": "The Enigma and the Shark Rerun",
       "event_20200723_cn": "Aurora Noctis",
       "event_20210624_cn": "Swirling Cherry Blossoms Rerun",
       "event_20210624_tw": "穹頂下的聖詠曲",
@@ -1150,7 +1153,8 @@
       "help": "",
       "easy": "easy",
       "normal": "normal",
-      "hard": "hard"
+      "hard": "hard",
+      "ex": "ex"
     },
     "UseTicket": {
       "name": "Use Ticket(s)",
@@ -1164,7 +1168,7 @@
     },
     "StageFilter": {
       "name": "Raid Daily Stage Filter",
-      "help": "Generally does not need to be modified or re-arranged but can do so if desired\nCan save on oil consumption if less are attacked"
+      "help": "Generally does not need to be modified or re-arranged but can do so if desired\nCan save on oil consumption if less are attacked\nSupports EX difficulty if specified, submarine is force called to increase clearing rate"
     }
   },
   "MaritimeEscort": {
@@ -1182,10 +1186,6 @@
       "name": "Commission Settings",
       "help": ""
     },
-    "DoMajorCommission": {
-      "name": "Do Major Commissions",
-      "help": "Enable allowance of undertaking 1200/1000 oil cost commissions; Commission Priority requires \"Major\" be included if enabled"
-    },
     "PresetFilter": {
       "name": "Preset Filter Select",
       "help": "People without a basic knowledge of commission drops rates and spawn are recommended to use pre-optimized presets instead of writing custom filters\nIf the commission farming is running 24 hours a day, the (7x24 Commission Farming) filter should be used\nIt is not recommended to use the oil priority filter while running commission farming",
@@ -1199,6 +1199,10 @@
     "CustomFilter": {
       "name": "Custom Commission Priority",
       "help": "To use your own filter, set \"Preset Filter Select\" to \"Custom\". All options have been defined at  <https://github.com/LmeSzinc/AzurLaneAutoScript/wiki/filter_string_en>"
+    },
+    "DoMajorCommission": {
+      "name": "Do Major Commissions",
+      "help": "1200 oil commission is now outdated, the yield is very low, it is recommended to disable"
     }
   },
   "Tactical": {
@@ -1670,18 +1674,54 @@
       "help": "All options have been defined at <https://github.com/LmeSzinc/AzurLaneAutoScript/wiki/reward_shop_filter_string>\nHowever unlike other shops, only Chip and Array are supported\nALAS does not browse, scroll, or recognize any other items displayed besides those two"
     }
   },
+  "ShipyardDr": {
+    "_info": {
+      "name": "DR Blueprints Purchase Settings",
+      "help": "Purchase research blueprints every day, discount of DR and PRY blueprints are counted independently."
+    },
+    "ResearchSeries": {
+      "name": "Research Series",
+      "help": "",
+      "2": "PR2"
+    },
+    "ShipIndex": {
+      "name": "Ship Index",
+      "help": "Position varies depending on progress, so must manually verify the target ship's position yourself\nStarting from left to right; 1 ~ 6",
+      "0": "Don't buy",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6"
+    },
+    "BuyAmount": {
+      "name": "Buy Amount",
+      "help": "The 1st and 2nd purchase everyday are free\nDiscounts are applied to the 3rd and onwards, gradually minimizing until full price\nExact discounts found at <https://azurlane.koumakan.jp/Research#Strengthening>"
+    }
+  },
   "Shipyard": {
     "_info": {
-      "name": "Shipyard Settings",
+      "name": "PRY Blueprints Purchase Settings",
       "help": ""
     },
     "ResearchSeries": {
       "name": "Research Series",
-      "help": ""
+      "help": "",
+      "1": "PR1",
+      "2": "PR2",
+      "3": "PR3"
     },
     "ShipIndex": {
       "name": "Ship Index",
-      "help": "Position varies depending on progress, so must manually verify the target ship's position yourself\nStarting from left to right; 1 ~ 6"
+      "help": "Position varies depending on progress, so must manually verify the target ship's position yourself\nStarting from left to right; 1 ~ 6",
+      "0": "Don't buy",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6"
     },
     "BuyAmount": {
       "name": "Buy Amount",
@@ -2227,39 +2267,25 @@
   "Benchmark": {
     "_info": {
       "name": "Performance Test",
-      "help": "Test which screenshot method and click method combination is the fastest and best for you\nSpeed can vary on the emulator being used and your PC build"
+      "help": "Test which screenshot method and click method combination is the fastest and best for you.\nSpeed can vary on the emulator being used and your PC build.\nAfter testing, select the fastest screenshot and control method in \"Alas\" - \"Emulator Settings\""
     },
-    "AdbScreenshot": {
-      "name": "Test ADB Screenshot",
-      "help": ""
+    "DeviceType": {
+      "name": "Device Type",
+      "help": "",
+      "emulator": "Emulator (Android <= 9)",
+      "emulator_android_12": "Emulator (Android > 9)",
+      "plone_cloud_with_adb": "Phone cloud with public network ADB",
+      "phone_cloud_without_adb": "Phone cloud without public network ADB",
+      "android_phone": "Android Phone (Android <= 9)",
+      "android_phone_12": "Android Phone (Android > 9)",
+      "android_phone_vmos": "Android Phone (VMOS emulator)"
     },
-    "AdbncScreenshot": {
-      "name": "Test ADB_nc Screenshot",
-      "help": ""
-    },
-    "Uiautomator2Screenshot": {
-      "name": "Test Uiautomator2 Screenshot",
-      "help": ""
-    },
-    "AscreencapScreenshot": {
-      "name": "Test aScreenCap Screenshot",
-      "help": ""
-    },
-    "AscreencapncScreenshot": {
-      "name": "Test aScreenCap_nc Screenshot",
-      "help": ""
-    },
-    "AdbClick": {
-      "name": "Test ADB Click",
-      "help": ""
-    },
-    "Uiautomator2Click": {
-      "name": "Test Uiautomator2 Click",
-      "help": ""
-    },
-    "MinitouchClick": {
-      "name": "Test Minitouch Click",
-      "help": ""
+    "TestScene": {
+      "name": "Test Scene",
+      "help": "",
+      "screenshot_click": "Screenshot + Click speed tests",
+      "screenshot": "Screenshot speed tests",
+      "click": "Click speed tests"
     }
   },
   "AzurLaneUncensored": {
