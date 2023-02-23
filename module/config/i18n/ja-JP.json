@@ -639,6 +639,7 @@
       "name": "Campaign.Event.name",
       "help": "Campaign.Event.help",
       "campaign_main": "campaign_main",
+      "event_20230223_cn": "黙示の遺構",
       "event_20220224_cn": "鳴動せし星霜の淵",
       "event_20200806_cn": "鉄血鮫とエニグマ（復刻）",
       "raid_20220127": "秘密事件調査",
@@ -1721,6 +1722,10 @@
     "BuyAmount": {
       "name": "ShipyardDr.BuyAmount.name",
       "help": "ShipyardDr.BuyAmount.help"
+    },
+    "LastRun": {
+      "name": "ShipyardDr.LastRun.name",
+      "help": "ShipyardDr.LastRun.help"
     }
   },
   "Shipyard": {
@@ -1749,6 +1754,10 @@
     "BuyAmount": {
       "name": "Shipyard.BuyAmount.name",
       "help": "Shipyard.BuyAmount.help"
+    },
+    "LastRun": {
+      "name": "Shipyard.LastRun.name",
+      "help": "Shipyard.LastRun.help"
     }
   },
   "Gacha": {
@@ -1838,6 +1847,17 @@
     "Collect": {
       "name": "SupplyPack.Collect.name",
       "help": "SupplyPack.Collect.help"
+    },
+    "DayOfWeek": {
+      "name": "SupplyPack.DayOfWeek.name",
+      "help": "SupplyPack.DayOfWeek.help",
+      "0": "0",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6"
     }
   },
   "Daily": {
