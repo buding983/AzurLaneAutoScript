@@ -16,6 +16,10 @@
       "name": "活動",
       "help": ""
     },
+    "EventDaily": {
+      "name": "活動每日",
+      "help": ""
+    },
     "Reward": {
       "name": "收穫",
       "help": ""
@@ -78,6 +82,26 @@
       "name": "活動圖-2",
       "help": ""
     },
+    "Raid": {
+      "name": "共鬥活動",
+      "help": ""
+    },
+    "Coalition": {
+      "name": "極地風暴",
+      "help": ""
+    },
+    "MaritimeEscort": {
+      "name": "商船護航",
+      "help": ""
+    },
+    "WarArchives": {
+      "name": "作戰檔案",
+      "help": "由於作戰檔案缺少維護，開荒功能不一定能正常使用，如果發現Alas運行异常，請手動完成開荒後使用自律尋敵功能"
+    },
+    "CoalitionSp": {
+      "name": "極地風暴每日SP",
+      "help": ""
+    },
     "EventA": {
       "name": "活動每日A圖",
       "help": ""
@@ -98,20 +122,8 @@
       "name": "活動每日SP圖",
       "help": ""
     },
-    "WarArchives": {
-      "name": "作戰檔案",
-      "help": "由於作戰檔案缺少維護，開荒功能不一定能正常使用，如果發現Alas運行异常，請手動完成開荒後使用自律尋敵功能"
-    },
-    "Raid": {
-      "name": "共鬥活動",
-      "help": ""
-    },
     "RaidDaily": {
       "name": "共鬥活動每日",
-      "help": ""
-    },
-    "MaritimeEscort": {
-      "name": "商船護航",
       "help": ""
     },
     "Commission": {
@@ -638,6 +650,9 @@
       "name": "活動名稱",
       "help": "自動選擇至最新的活動圖",
       "campaign_main": "主線圖",
+      "event_20211111_cn": "杰諾瓦的焰火",
+      "coalition_20230323": "Frostfall",
+      "raid_20220630": "來自鳶尾的天使",
       "event_20210422_cn": "復興的讚美詩",
       "event_20210624_cn": "復刻-浮櫻影華",
       "event_20230223_cn": "Revelations of Dust",
@@ -652,7 +667,6 @@
       "event_20221124_cn": "鍊金術士與秘密遺跡群島",
       "event_20210325_cn": "復刻箱庭療法",
       "event_20201229_cn": "負象限作戰",
-      "event_20211111_cn": "杰諾瓦的焰火",
       "raid_20221027": "Fight On Royal Maids!(Part 3)",
       "event_20210121_cn": "復刻神聖的悲喜劇",
       "event_20220915_cn": "Violet Tempest Blooming Lycoris",
@@ -664,7 +678,6 @@
       "event_20220728_cn": "Aquilifers Ballade",
       "event_20200917_cn": "蝶海夢花",
       "event_20201029_cn": "激唱的UNIVERSE",
-      "raid_20220630": "Angel of Iris",
       "raid_20210708": "復刻穿越彼方的水線",
       "event_20200820_cn": "復刻鐵血音符誓言",
       "event_20201012_cn": "劃破海空之翼",
@@ -1196,6 +1209,18 @@
     "Enable": {
       "name": "啟用商船護航",
       "help": ""
+    }
+  },
+  "Coalition": {
+    "_info": {
+      "name": "活動設置",
+      "help": "出擊前必須在遊戲內手動配隊"
+    },
+    "Fleet": {
+      "name": "出擊隊伍",
+      "help": "",
+      "single": "單隊連戰",
+      "multi": "多隊出擊"
     }
   },
   "Commission": {
@@ -1959,7 +1984,7 @@
       "5": "5",
       "6": "6"
     },
-"EmergencyModuleDevelopment": {
+    "EmergencyModuleDevelopment": {
       "name": "限時兵裝訓練（限時兵裝本）",
       "help": "",
       "skip": "不打",
@@ -2003,16 +2028,24 @@
       "help": "",
       "max_exp": "經驗值最多",
       "easiest": "戰力最低",
-      "leftmost": "最左邊",
+      "leftmost": "排名最高",
       "easiest_else_exp": "先最簡單再經驗最多"
     },
     "OpponentTrial": {
       "name": "每個對手嘗試 X 次",
       "help": ""
     },
-    "ExercisePreserve": {
-      "name": "保留 X 次演習次數",
-      "help": ""
+    "ExerciseStrategy": {
+      "name": "演習策略",
+      "help": "若保留 5 次，則會在設定時間嘗試衝擊元帥，並在周日18點刷新后清空所有次數",
+      "aggressive": "清空演習次數",
+      "fri18": "保留5次直到星期五18點",
+      "sat0": "保留5次直到星期六0點",
+      "sat12": "保留5次直到星期六12點",
+      "sat18": "保留5次直到星期六18點",
+      "sun0": "保留5次直到星期日0點",
+      "sun12": "保留5次直到星期日12點",
+      "sun18": "保留5次直到星期日18點"
     },
     "LowHpThreshold": {
       "name": "血量低於 X 後撤退",
@@ -2340,7 +2373,7 @@
     },
     "Repository": {
       "name": "反和諧倉庫",
-      "help": "一般不需要修改\n倉庫 https://github.com/LmeSzinc/AzurLaneUncensored\n國內鏡像(預設) https://gitee.com/LmeSzinc/AzurLaneUncensored"
+      "help": "一般不需要修改\n倉庫 https://github.com/LmeSzinc/AzurLaneUncensored\n國內鏡像(預設) https://e.coding.net/llop18870/alas/AzurLaneUncensored.git"
     }
   },
   "GameManager": {

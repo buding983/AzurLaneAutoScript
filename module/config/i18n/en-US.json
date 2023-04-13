@@ -16,6 +16,10 @@
       "name": "Event",
       "help": ""
     },
+    "EventDaily": {
+      "name": "Event Daily",
+      "help": ""
+    },
     "Reward": {
       "name": "Reward",
       "help": ""
@@ -78,6 +82,26 @@
       "name": "Event-2",
       "help": ""
     },
+    "Raid": {
+      "name": "Raid",
+      "help": ""
+    },
+    "Coalition": {
+      "name": "Frostfall",
+      "help": ""
+    },
+    "MaritimeEscort": {
+      "name": "Maritime Escort",
+      "help": ""
+    },
+    "WarArchives": {
+      "name": "War Archives",
+      "help": "Due to the lack of maintenance of war archives, continuous clear may not work normally, if Alas runs abnormally, Please manually finish clearing and use auto search"
+    },
+    "CoalitionSp": {
+      "name": "Frostfall Daily SP",
+      "help": ""
+    },
     "EventA": {
       "name": "Event Daily A",
       "help": ""
@@ -98,20 +122,8 @@
       "name": "Event Daily SP",
       "help": ""
     },
-    "WarArchives": {
-      "name": "War Archives",
-      "help": "Due to the lack of maintenance of war archives, continuous clear may not work normally, if Alas runs abnormally, Please manually finish clearing and use auto search"
-    },
-    "Raid": {
-      "name": "Raid",
-      "help": ""
-    },
     "RaidDaily": {
       "name": "Raid Daily",
-      "help": ""
-    },
-    "MaritimeEscort": {
-      "name": "Maritime Escort",
       "help": ""
     },
     "Commission": {
@@ -638,6 +650,9 @@
       "name": "Event Name",
       "help": "Automatically selects to the latest event",
       "campaign_main": "campaign_main",
+      "event_20211111_cn": "The Flame-Touched Dagger Rerun",
+      "coalition_20230323": "Frostfall",
+      "raid_20220630": "Angel of Iris",
       "event_20210422_cn": "Daedalian Hymn Rerun",
       "event_20210624_cn": "Swirling Cherry Blossoms Rerun",
       "event_20230223_cn": "Revelations of Dust",
@@ -652,7 +667,6 @@
       "event_20221124_cn": "The Alchemist and the Archipelago of Secrets",
       "event_20210325_cn": "Ashen Simulacrum Rerun",
       "event_20201229_cn": "Inverted Orthant Rerun",
-      "event_20211111_cn": "The Flame-Touched Dagger",
       "raid_20221027": "Fight On Royal Maids!(Part 3)",
       "event_20210121_cn": "Empyreal Tragicomedy Rerun",
       "event_20220915_cn": "Violet Tempest Blooming Lycoris",
@@ -664,7 +678,6 @@
       "event_20220728_cn": "Aquilifers Ballade",
       "event_20200917_cn": "Dreamwakers Butterfly Rerun",
       "event_20201029_cn": "Universe in Unison",
-      "raid_20220630": "Angel of Iris",
       "raid_20210708": "Cross Wave rerun",
       "event_20200820_cn": "Scherzo of Iron and Blood Rerun",
       "event_20201012_cn": "Sundered Blue Rerun",
@@ -1196,6 +1209,18 @@
     "Enable": {
       "name": "Enable maritime Escort",
       "help": ""
+    }
+  },
+  "Coalition": {
+    "_info": {
+      "name": "Event Settings",
+      "help": "Fleets must be prepared manually in game before running"
+    },
+    "Fleet": {
+      "name": "Fleet",
+      "help": "",
+      "single": "Solo Challenge",
+      "multi": "Coalition Battle"
     }
   },
   "Commission": {
@@ -2001,18 +2026,26 @@
     "OpponentChooseMode": {
       "name": "Opponent Choose Mode",
       "help": "",
-      "max_exp": "max_exp",
-      "easiest": "easiest",
-      "leftmost": "leftmost",
-      "easiest_else_exp": "easiest_else_exp"
+      "max_exp": "Most Exp.",
+      "easiest": "Easiest",
+      "leftmost": "Highest ranking",
+      "easiest_else_exp": "Easiest else Exp."
     },
     "OpponentTrial": {
       "name": "Each Opponent Try X Time(s)",
       "help": "1 ~ Positive Infinity"
     },
-    "ExercisePreserve": {
-      "name": "Keep X Number Remain(s)",
-      "help": "1 ~ 10\n1 means run until 1/10"
+    "ExerciseStrategy": {
+      "name": "Exercise Strategy (Keep X number remains)",
+      "help": "If keeping 5 number remains, will try admiral at set time and clear number remains at last recover",
+      "aggressive": "Clear exercise remains",
+      "fri18": "Keep 5 until Friday 18pm",
+      "sat0": "Keep 5 until Saturday 12am",
+      "sat12": "Keep 5 until Saturday 12pm",
+      "sat18": "Keep 5 until Saturday 18pm",
+      "sun0": "Keep 5 until Sunday 12am",
+      "sun12": "Keep 5 until Sunday 12pm",
+      "sun18": "Keep 5 until Sunday 18pm"
     },
     "LowHpThreshold": {
       "name": "Low HP Threshold",
@@ -2340,7 +2373,7 @@
     },
     "Repository": {
       "name": "AzurLaneUncensored Repository",
-      "help": "Do not need to modify\nGithub: <https://github.com/LmeSzinc/AzurLaneUncensored>\nCN mirror: <https://gitee.com/LmeSzinc/AzurLaneUncensored>"
+      "help": "Do not need to modify\nGithub: <https://github.com/LmeSzinc/AzurLaneUncensored>\nCN mirror: <https://e.coding.net/llop18870/alas/AzurLaneUncensored.git>"
     }
   },
   "GameManager": {

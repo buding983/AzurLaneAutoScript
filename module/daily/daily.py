@@ -136,6 +136,20 @@ class Daily(Combat, DailyEquipment):
         stage = dic.get(stage, 0)
         return int(stage), int(fleet)
 
+    @property
+    def supply_line_disruption_index(self):
+        if self.emergency_module_development:
+            return 2
+        else:
+            return 2
+
+    @property
+    def empty_index(self):
+        if self.emergency_module_development:
+            return 4
+        else:
+            return 4
+
     def daily_execute(self, remain=3, stage=1, fleet=1):
         """
         Args:
@@ -175,7 +189,7 @@ class Daily(Combat, DailyEquipment):
             result = self.daily_enter(button)
             if not result:
                 break
-            if self.daily_current == 2:
+            if self.daily_current == self.supply_line_disruption_index:
                 logger.info('Submarine daily skip not unlocked, skip')
                 self.ui_click(click_button=BACK_ARROW, check_button=daily_enter_check, skip_first_screenshot=True)
                 break
@@ -263,13 +277,13 @@ class Daily(Combat, DailyEquipment):
         while 1:
             if self.daily_current > 7:
                 break
-            if self.daily_current == 4:
+            if self.daily_current == self.empty_index:
                 logger.info('This daily is not open now')
                 self.daily_check()
                 self.next()
                 continue
             stage, fleet = self.get_daily_stage_and_fleet()
-            if self.daily_current == 2 and not self.config.Daily_UseDailySkip:
+            if self.daily_current == self.supply_line_disruption_index and not self.config.Daily_UseDailySkip:
                 logger.info('Skip supply line disruption if UseDailySkip disabled')
                 self.daily_check()
                 self.next()
@@ -279,7 +293,7 @@ class Daily(Combat, DailyEquipment):
                 self.daily_check()
                 self.next()
                 continue
-            if self.daily_current != 2 and not fleet:
+            if self.daily_current != self.supply_line_disruption_index and not fleet:
                 logger.info(f'No fleet set on daily_current: {self.daily_current}, skip')
                 self.daily_check()
                 self.next()
