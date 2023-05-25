@@ -64,13 +64,13 @@ class Campaign(CampaignBase):
     MAP = MAP
 
     def battle_0(self):
-        if self.clear_filter_enemy('3E > 3L > 3M > 3C > 2E > 2L > 2M > 2C > 1L > 1M', preserve=1):
+        if self.clear_filter_enemy('3T > 3L > 3E > 3C > 3M > 2T > 2L > 2E > 2C > 2M > 1T > 1L > 1M', preserve=0):
             return True
 
         return self.battle_default()
 
     def battle_5(self):
-        if self.clear_filter_enemy('3L > 2E > 2L > 2M > 2C > 1L > 1M > 3E > 3C > 3M', preserve=0):
+        if self.clear_filter_enemy('3T > 3L > 2T > 2L > 2E > 2C > 2M > 1T > 1L > 1M > 3E > 3C > 3M', preserve=0):
             return True
 
         return self.battle_default()
