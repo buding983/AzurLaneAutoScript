@@ -13,7 +13,7 @@ from adbutils.errors import AdbError
 
 from module.base.decorator import Config, cached_property, del_cached_property
 from module.base.utils import ensure_time
-from module.config.server import VALID_PACKAGE, VALID_CHANNEL_PACKAGE, set_server
+from module.config.server import VALID_CHANNEL_PACKAGE, VALID_PACKAGE, set_server
 from module.device.connection_attr import ConnectionAttr
 from module.device.method.utils import (PackageNotInstalled, RETRY_TRIES, get_serial_pair, handle_adb_error,
                                         possible_reasons, random_port, recv_all, remove_shell_warning, retry_sleep)
