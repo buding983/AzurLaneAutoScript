@@ -12,6 +12,7 @@ from module.ui.scroll import Scroll
 
 MEDAL_SHOP_SCROLL = Scroll(MEDAL_SHOP_SCROLL_AREA, color=(247, 211, 66))
 MEDAL_SHOP_SCROLL.edge_threshold = 0.15
+MEDAL_SHOP_SCROLL.drag_threshold = 0.15
 
 
 class ShopPriceOcr(DigitYuv):
@@ -37,19 +38,6 @@ class MedalShop2(ShopClerk, ShopStatus):
         """
         return self.config.MedalShop2_Filter.strip()
 
-    @Config.when(SERVER='tw')
-    def _get_medals(self):
-        """
-        Returns:
-            np.array: [[x1, y1], [x2, y2]], location of the medal icon upper-left corner.
-        """
-        left_column = self.image_crop((489, 256, 1120, 572))
-        medals = TEMPLATE_MEDAL_ICON.match_multi(left_column, similarity=0.5, threshold=5)
-        medals = Points([(0., m.area[1]) for m in medals]).group(threshold=5)
-        logger.attr('Medals_icon', len(medals))
-        return medals
-
-    @Config.when(SERVER=None)
     def _get_medals(self):
         """
         Returns:
