@@ -83,7 +83,7 @@ class Campaign(CampaignBase):
     def battle_3(self):
         self.pick_up_ammo()
 
-        if self.clear_filter_enemy('3T > 3L > 2T > 2L > 2E > 2C > 2M > 1T > 1L > 1M > 3E > 3C > 3M', preserve=0):
+        if self.clear_filter_enemy('3T > 3L > 3E > 3C > 3M > 2T > 2L > 2E > 2C > 2M > 1T > 1L > 1M', preserve=0):
             return True
 
         return self.battle_default()
