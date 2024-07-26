@@ -41,6 +41,7 @@ class MailWhite(UI):
             MAIL_MANAGE
         ])
         timeout = Timer(0.6, count=1)
+        has_mail = False
         while 1:
             if skip_first_screenshot:
                 skip_first_screenshot = False
@@ -51,7 +52,7 @@ class MailWhite(UI):
             if self.appear(MAIL_BATCH_CLAIM, offset=(20, 20)):
                 logger.info('Mail entered')
                 return True
-            if self.appear(GOTO_MAIN_WHITE, offset=(20, 20)):
+            if not has_mail and self.appear(GOTO_MAIN_WHITE, offset=(20, 20)):
                 timeout.start()
                 if timeout.reached():
                     logger.info('Mail empty')
@@ -59,6 +60,7 @@ class MailWhite(UI):
 
             # Click
             if self.appear_then_click(MAIL_MANAGE, offset=(30, 30), interval=3):
+                has_mail = True
                 continue
             if self.ui_main_appear_then_click(page_mail, offset=(30, 30), interval=3):
                 continue
@@ -234,7 +236,7 @@ class MailWhite(UI):
         if not merit and not maintenance and not trade_license:
             logger.warning('Nothing to claim')
             return False
-        if self.config.SERVER not in ['cn', 'en']:
+        if self.config.SERVER not in ['cn', 'en', 'jp']:
             logger.warning(f'Mail is not supported in {self.config.SERVER}, please contact server maintainers')
             return False
 
