@@ -2,20 +2,30 @@ from module.base.timer import Timer
 from module.campaign.assets import *
 from module.campaign.campaign_event import CampaignEvent
 from module.campaign.campaign_ocr import CampaignOcr
-from module.exception import CampaignNameError, ScriptEnd
+from module.exception import CampaignEnd, CampaignNameError, ScriptEnd
 from module.logger import logger
+from module.map.assets import WITHDRAW
+from module.map.map_operation import MapOperation
 from module.ui.assets import CAMPAIGN_CHECK
 from module.ui.switch import Switch
 
-MODE_SWITCH_1 = Switch('Mode_switch_1', offset=(30, 10))
+
+class ModeSwitch(Switch):
+    def handle_additional(self, main):
+        if main.appear(WITHDRAW, offset=(30, 30)):
+            logger.warning(f'ModeSwitch: WITHDRAW appears')
+            raise CampaignNameError
+
+
+MODE_SWITCH_1 = ModeSwitch('Mode_switch_1', offset=(30, 10))
 MODE_SWITCH_1.add_status('normal', SWITCH_1_NORMAL)
 MODE_SWITCH_1.add_status('hard', SWITCH_1_HARD)
-MODE_SWITCH_2 = Switch('Mode_switch_2', offset=(30, 10))
+MODE_SWITCH_2 = ModeSwitch('Mode_switch_2', offset=(30, 10))
 MODE_SWITCH_2.add_status('hard', SWITCH_2_HARD)
 MODE_SWITCH_2.add_status('ex', SWITCH_2_EX)
 
 
-class CampaignUI(CampaignEvent, CampaignOcr):
+class CampaignUI(MapOperation, CampaignEvent, CampaignOcr):
     ENTRANCE = Button(area=(), color=(), button=(), name='default_button')
 
     def campaign_ensure_chapter(self, index, skip_first_screenshot=True):
@@ -202,6 +212,21 @@ class CampaignUI(CampaignEvent, CampaignOcr):
         else:
             logger.warning(f'Unknown campaign chapter: {name}')
 
+    def handle_campaign_ui_additional(self):
+        """
+        Returns:
+            bool: If handled
+        """
+        if self.appear(WITHDRAW, offset=(30, 30)):
+            # logger.info("WITHDRAW button found, wait until map loaded to prevent bugs in game client")
+            self.ensure_no_info_bar(timeout=2)
+            try:
+                self.withdraw()
+            except CampaignEnd:
+                pass
+            return True
+        return False
+
     def ensure_campaign_ui(self, name, mode='normal'):
         for n in range(20):
             try:
@@ -210,6 +235,8 @@ class CampaignUI(CampaignEvent, CampaignOcr):
                 return True
             except CampaignNameError:
                 pass
+            if self.handle_campaign_ui_additional():
+                continue
 
             self.device.screenshot()
 
