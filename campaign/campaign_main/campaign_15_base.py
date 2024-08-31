@@ -2,6 +2,7 @@ from module.base.mask import Mask
 from module.base.timer import Timer
 from module.campaign.campaign_base import CampaignBase as CampaignBase_
 from module.handler.assets import STRATEGY_OPENED
+from module.handler.strategy import MOB_MOVE_OFFSET
 from module.logger import logger
 from module.map.map_grids import SelectedGrids
 from module.map.utils import location_ensure
@@ -13,7 +14,7 @@ MASK_MAP_UI_W15 = Mask(file='./assets/mask/MASK_MAP_UI_W15.png')
 
 class Config:
     # Ambushes can be avoid by having more DDs.
-    MAP_WALK_OPTIMIZE = False
+    MAP_WALK_TURNING_OPTIMIZE = False
     MAP_HAS_MYSTERY = False
     MAP_ENEMY_TEMPLATE = ['Light', 'Main', 'Carrier', 'CarrierSpecial']
     INTERNAL_LINES_FIND_PEAKS_PARAMETERS = {
@@ -163,7 +164,7 @@ class CampaignBase(CampaignBase_):
                 self.device.screenshot()
 
             # End
-            if self.appear(STRATEGY_OPENED, offset=(120, 120)):
+            if self.appear(STRATEGY_OPENED, offset=MOB_MOVE_OFFSET):
                 break
             # Click
             if interval.reached() and self.is_in_strategy_mob_move():
