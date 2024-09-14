@@ -60,6 +60,9 @@
       "SSR": false,
       "RetireAmount": "retire_all"
     },
+    "UITheme": {
+      "BattleUITheme": "auto_detect"
+    },
     "Storage": {
       "Storage": {}
     }

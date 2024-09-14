@@ -649,6 +649,20 @@
       "retire_10": "退役10个"
     }
   },
+  "UITheme": {
+    "_info": {
+      "name": "游戏UI设置",
+      "help": ""
+    },
+    "BattleUITheme": {
+      "name": "战斗主题",
+      "help": "",
+      "auto_detect": "自动检测",
+      "battleui_classic": "经典主题",
+      "battleui_new": "新版主题",
+      "battleui_iridescentfantasy": "梦幻霓虹"
+    }
+  },
   "Campaign": {
     "_info": {
       "name": "关卡设置",
