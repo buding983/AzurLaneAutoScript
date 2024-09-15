@@ -81,33 +81,14 @@ class Combat(Level, HPBalancer, Retirement, SubmarineCall, CombatAuto, CombatMan
             bool:
         """
         self.device.stuck_record_add(PAUSE)
-        return self.check_pause_button() is not None
-
-    def check_pause_button(self):
-        """
-        Returns:
-            button:
-        """
         if self.config.SERVER in ['en']:
-            if PAUSE.match_luma(self.device.image, offset=(20, 20)):
-                return PAUSE
+            return PAUSE.match_luma(self.device.image, offset=(20, 20))
         else:
-            if self.config.UITheme_BattleUITheme == 'auto_detect' or self.config.UITheme_BattleUITheme == 'battleui_classic':
-                color = get_color(self.device.image, PAUSE.area)
-                if color_similar(color, PAUSE.color) or color_similar(color, (238, 244, 248)):
-                    if np.max(self.image_crop(PAUSE_DOUBLE_CHECK, copy=False)) < 153:
-                        return PAUSE
-            if self.config.UITheme_BattleUITheme == 'auto_detect' or self.config.UITheme_BattleUITheme == 'battleui_iridescentfantasy':
-                color = get_color(self.device.image, PAUSE_IRIDESCENTFANTASY.area)
-                if color_similar(color, PAUSE_IRIDESCENTFANTASY.color):
-                    if np.max(self.image_crop(PAUSE_IRIDESCENTFANTASY_DOUBLE_CHECK, copy=False)) > 230:
-                        return PAUSE_IRIDESCENTFANTASY
-            if self.config.UITheme_BattleUITheme == 'auto_detect' or self.config.UITheme_BattleUITheme == 'battleui_new':
-                color = get_color(self.device.image, PAUSE_NEW.area)
-                if color_similar(color, PAUSE_NEW.color):
-                    if np.max(self.image_crop(PAUSE_NEW_DOUBLE_CHECK, copy=False)) < 90:
-                        return PAUSE_NEW
-        return None
+            color = get_color(self.device.image, PAUSE.area)
+            if color_similar(color, PAUSE.color) or color_similar(color, (238, 244, 248)):
+                if np.max(self.image_crop(PAUSE_DOUBLE_CHECK, copy=False)) < 153:
+                    return True
+        return False
 
     def ensure_combat_oil_loaded(self):
         self.wait_until_stable(COMBAT_OIL_LOADING)

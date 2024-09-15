@@ -364,18 +364,6 @@
         ]
       }
     },
-    "UITheme": {
-      "BattleUITheme": {
-        "type": "select",
-        "value": "auto_detect",
-        "option": [
-          "auto_detect",
-          "battleui_classic",
-          "battleui_new",
-          "battleui_iridescentfantasy"
-        ]
-      }
-    },
     "Storage": {
       "Storage": {
         "type": "storage",

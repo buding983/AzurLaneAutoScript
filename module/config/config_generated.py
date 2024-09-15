@@ -72,9 +72,6 @@ class GeneratedConfig:
     OldRetire_SSR = False
     OldRetire_RetireAmount = 'retire_all'  # retire_all, retire_10
 
-    # Group `UITheme`
-    UITheme_BattleUITheme = 'auto_detect'  # auto_detect, battleui_classic, battleui_new, battleui_iridescentfantasy
-
     # Group `Campaign`
     Campaign_Name = '12-4'
     Campaign_Event = 'campaign_main'  # campaign_main

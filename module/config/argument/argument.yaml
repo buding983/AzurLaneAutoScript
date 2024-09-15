@@ -142,10 +142,6 @@ OldRetire:
   RetireAmount:
     value: retire_all
     option: [ retire_all, retire_10 ]
-UITheme:
-  BattleUITheme:
-    value: auto_detect
-    option: [ auto_detect, battleui_classic, battleui_new, battleui_iridescentfantasy ]
 
 # ==================== Farm ====================
 
