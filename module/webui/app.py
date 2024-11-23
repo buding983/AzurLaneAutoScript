@@ -569,12 +569,12 @@ class AlasGUI(Frame):
                     ],
                     size="auto auto",
                 )
+                create_switch_button(func, True)
                 put_button(
                     label=t("Gui.Button.Setting"),
                     onclick=lambda: self.alas_set_group(func.command),
                     color="off",
                 )
-                create_switch_button(func, True)
 
         clear("running_tasks")
         clear("pending_tasks")
