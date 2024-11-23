@@ -2537,6 +2537,8 @@
       "ScrollOFF": "自动滚动 关",
       "ClearLog": "清空日志",
       "Setting": "设置",
+      "Enable": "启用",
+      "Disable": "停用",
       "CheckUpdate": "检查更新",
       "ClickToUpdate": "进行更新",
       "RetryUpdate": "重试更新",
@@ -2571,7 +2573,8 @@
       "Running": "运行中",
       "Pending": "队列中",
       "Waiting": "等待中",
-      "NoTask": "无任务"
+      "NoTask": "无任务",
+      "Recent": "近期使用"
     },
     "AddAlas": {
       "PopupTitle": "添加新配置",

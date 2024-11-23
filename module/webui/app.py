@@ -380,6 +380,14 @@ class AlasGUI(Frame):
                     put_scope("waiting_tasks"),
                 ],
             )
+            put_scope(
+                "recent",
+                [
+                    put_text(t("Gui.Overview.Recent")),
+                    put_html('<hr class="hr-group">'),
+                    put_scope("recent_tasks"),
+                ],
+            )
 
         switch_scheduler = BinarySwitchButton(
             label_on=t("Gui.Button.Stop"),
@@ -530,6 +538,27 @@ class AlasGUI(Frame):
             running = []
             pending = []
         waiting = self.alas_config.waiting_task
+        recent = self.alas_config.recent_task
+        def switch_enable(func: Function):
+            if func is None:
+                return
+            func.enable = not func.enable
+            self.alas_config.modified[f'{func.command}.Scheduler.Enable']=func.enable
+            self.alas_config.update()
+            create_switch_button(func)
+
+        def create_switch_button(func: Function, create=False):
+            if deep_get(self.ALAS_ARGS, keys=f'{func.command}.Scheduler.Enable.type') != 'checkbox':
+                return
+            swtich_scope=f"overview-task-{func.command}-switch"
+            if create:
+                put_scope(swtich_scope)
+            with use_scope(swtich_scope, clear=not create):
+                put_button(
+                    label=t("Gui.Button.Disable") if func.enable else t("Gui.Button.Enable"),
+                    onclick=lambda func=func: switch_enable(func),
+                    color="off" if func.enable else "on",
+                ).style("padding-left:5px")
 
         def put_task(func: Function):
             with use_scope(f"overview-task_{func.command}"):
@@ -545,10 +574,12 @@ class AlasGUI(Frame):
                     onclick=lambda: self.alas_set_group(func.command),
                     color="off",
                 )
+                create_switch_button(func, True)
 
         clear("running_tasks")
         clear("pending_tasks")
         clear("waiting_tasks")
+        clear("recent_tasks")
         with use_scope("running_tasks"):
             if running:
                 for task in running:
@@ -567,6 +598,12 @@ class AlasGUI(Frame):
                     put_task(task)
             else:
                 put_text(t("Gui.Overview.NoTask")).style("--overview-notask-text--")
+        with use_scope("recent_tasks"):
+            if recent:
+                for task in recent:
+                    put_task(task)
+            else:
+                put_text(t("Gui.Overview.Recent")).style("--overview-notask-text--")
 
     @use_scope("content", clear=True)
     def alas_daemon_overview(self, task: str) -> None:

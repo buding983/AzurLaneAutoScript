@@ -373,6 +373,7 @@ pre.rich-traceback-code {
 #pywebio-scope-running,
 #pywebio-scope-pending,
 #pywebio-scope-waiting,
+#pywebio-scope-recent,
 #pywebio-scope-scheduler-bar,
 #pywebio-scope-log-bar,
 #pywebio-scope-log,
@@ -403,7 +404,8 @@ pre.rich-traceback-code {
 
 #pywebio-scope-running,
 #pywebio-scope-pending,
-#pywebio-scope-waiting {
+#pywebio-scope-waiting,
+#pywebio-scope-recent {
     display: grid;
     grid-auto-flow: row;
     grid-template-rows: auto auto 1fr;
@@ -411,7 +413,8 @@ pre.rich-traceback-code {
 
 #pywebio-scope-running > p,
 #pywebio-scope-pending > p,
-#pywebio-scope-waiting > p {
+#pywebio-scope-waiting > p,
+#pywebio-scope-recent > p {
     font-size: 1.25rem;
     font-weight: 500;
     margin: 0 0.625rem 0 !important;
@@ -419,7 +422,8 @@ pre.rich-traceback-code {
 
 #pywebio-scope-running_tasks,
 #pywebio-scope-pending_tasks,
-#pywebio-scope-waiting_tasks {
+#pywebio-scope-waiting_tasks,
+#pywebio-scope-recent_tasks {
     overflow-y: auto;
     height: 100%;
 }

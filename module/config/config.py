@@ -93,6 +93,7 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig, ConfigWatcher
         # waiting_task: Run time haven't been reached, wait needed.
         self.pending_task = []
         self.waiting_task = []
+        self.recent_task = []
         # Task to run and bind.
         # Task means the name of the function to run in AzurLaneAutoScript class.
         self.task: Function
@@ -205,12 +206,16 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig, ConfigWatcher
         pending = []
         waiting = []
         error = []
+        recent = []
         now = datetime.now()
         if AzurLaneConfig.is_hoarding_task:
             now -= self.hoarding
+        recentTime = now - timedelta(weeks=2)
         for func in self.data.values():
             func = Function(func)
             if not func.enable:
+                if func.next_run > recentTime:
+                    recent.append(func)
                 continue
             if not isinstance(func.next_run, datetime):
                 error.append(func)
@@ -231,6 +236,7 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig, ConfigWatcher
 
         self.pending_task = pending
         self.waiting_task = waiting
+        self.recent_task = recent
 
     def get_next(self):
         """

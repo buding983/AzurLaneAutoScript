@@ -16,6 +16,8 @@ Button:
   ScrollOFF:
   ClearLog:
   Setting:
+  Enable:
+  Disable:
   CheckUpdate:
   ClickToUpdate:
   RetryUpdate:
@@ -51,6 +53,7 @@ Overview:
   Pending:
   Waiting:
   NoTask:
+  Recent:
 
 AddAlas:
   PopupTitle:

@@ -2537,6 +2537,8 @@
       "ScrollOFF": "自動スクロール OFF",
       "ClearLog": "ログクリーニング",
       "Setting": "設定",
+      "Enable": "有効",
+      "Disable": "無効",
       "CheckUpdate": "アップデータチェック",
       "ClickToUpdate": "アップデータ実行",
       "RetryUpdate": "アップデータ再試行",
@@ -2571,7 +2573,8 @@
       "Running": "実行中",
       "Pending": "隊列中",
       "Waiting": "Waiting",
-      "NoTask": "No Task"
+      "NoTask": "No Task",
+      "Recent": "最近のタスク"
     },
     "AddAlas": {
       "PopupTitle": "新しいコンフィグを追加",

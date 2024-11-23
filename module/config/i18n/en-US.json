@@ -2537,6 +2537,8 @@
       "ScrollOFF": "Auto Scroll OFF",
       "ClearLog": "Clear Log",
       "Setting": "Setting",
+      "Enable": "Enable",
+      "Disable": "Disable",
       "CheckUpdate": "Check update",
       "ClickToUpdate": "Click to update",
       "RetryUpdate": "Retry update",
@@ -2571,7 +2573,8 @@
       "Running": "Running",
       "Pending": "Pending",
       "Waiting": "Waiting",
-      "NoTask": "No Task"
+      "NoTask": "No Task",
+      "Recent": "Recent Task"
     },
     "AddAlas": {
       "PopupTitle": "Add new config",

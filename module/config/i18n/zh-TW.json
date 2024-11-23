@@ -2571,7 +2571,8 @@
       "Running": "執行中",
       "Pending": "佇列中",
       "Waiting": "等待中",
-      "NoTask": "無任務"
+      "NoTask": "無任務",
+      "Recent": "近期使用"
     },
     "AddAlas": {
       "PopupTitle": "添加新的設定",
