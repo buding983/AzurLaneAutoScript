@@ -557,8 +557,8 @@ class AlasGUI(Frame):
                 put_button(
                     label=t("Gui.Button.Disable") if func.enable else t("Gui.Button.Enable"),
                     onclick=lambda func=func: switch_enable(func),
-                    color="off" if func.enable else "on",
-                ).style("padding-left:5px")
+                    color="switch-"+("off" if func.enable else "on"),
+                )
 
         def put_task(func: Function):
             with use_scope(f"overview-task_{func.command}"):

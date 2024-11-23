@@ -15,6 +15,11 @@
     border: 1px solid lightgrey;
 }
 
+.btn-switch-off {
+    background-color: #ffd5d5 !important;
+    border: 1px solid lightgrey;
+}
+
 .btn-on {
     background-color: #4e4c97;
     border: 1px solid lightgrey;
@@ -22,6 +27,16 @@
 }
 
 .btn-on:hover {
+    color: white;
+}
+
+.btn-switch-on {
+    background-color: #a0c8ff !important;
+    border: 1px solid lightgrey;
+    color: white;
+}
+
+.btn-switch-on:hover {
     color: white;
 }
 

@@ -19,8 +19,18 @@
     border: 1px solid #202225;
 }
 
+.btn-switch-off {
+    background-color: #894949 !important;
+    border: 1px solid #202225;
+}
+
 .btn-on {
     background-color: #7a77bb;
+    border: 1px solid #202225;
+}
+
+.btn-switch-on {
+    background-color: #6d98ab;
     border: 1px solid #202225;
 }
 

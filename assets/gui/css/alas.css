@@ -73,6 +73,13 @@ footer {
     margin: 0;
 }
 
+.btn-switch-off,
+.btn-switch-on {
+    border-radius: 0;
+    margin: 0;
+    margin-left: 5px;
+}
+
 .btn-navigator {
     border-radius: 0;
     margin: 0 !important;
