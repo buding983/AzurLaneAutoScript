@@ -9,7 +9,7 @@ from cached_property import cached_property
 
 from module.base.decorator import del_cached_property
 from module.config.config import AzurLaneConfig, TaskEnd
-from module.config.utils import deep_get, deep_set
+from module.config.deep import deep_get, deep_set
 from module.exception import *
 from module.logger import logger
 from module.notify import handle_notify
@@ -406,6 +406,10 @@ class AzurLaneAutoScript:
     def opsi_daemon(self):
         from module.daemon.os_daemon import AzurLaneDaemon
         AzurLaneDaemon(config=self.config, device=self.device, task="OpsiDaemon").run()
+
+    def event_story(self):
+        from module.eventstory.eventstory import EventStory
+        EventStory(config=self.config, device=self.device, task="EventStory").run()
 
     def azur_lane_uncensored(self):
         from module.daemon.uncensored import AzurLaneUncensored
