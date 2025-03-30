@@ -111,6 +111,8 @@ class HospitalClue(HospitalUI):
 
         # Search INVEST
         buttons = TEMPLATE_INVEST.match_multi(image)
+        buttons += TEMPLATE_INVEST2.match_multi(image)
+        buttons = sorted(buttons, key=lambda b: b.area[1])
         count = len(buttons)
         if count == 0:
             return None
@@ -137,6 +139,7 @@ class HospitalClue(HospitalUI):
             return button
         if TEMPLATE_REMAIN_TIMES.match(image):
             return button
+        return None
 
     def clue_enter(self, skip_first_screenshot=True):
         """
@@ -205,6 +208,7 @@ class HospitalClue(HospitalUI):
                     return False
                 logger.info(f'is_in_clue -> {invest}')
                 self.device.click(invest)
+                self.interval_reset(HOSIPITAL_CLUE_CHECK, interval=2)
                 continue
             if self.appear_then_click(HOSPITAL_BATTLE_PREPARE, offset=(20, 20), interval=2):
                 continue
@@ -258,7 +262,8 @@ class HospitalClue(HospitalUI):
         area = button.area
         search = CLUE_LIST.area
         # Search if there's any cyan
-        area = (search[0], area[1], search[2], area[3])
+        # JP has text overflowed, set right to 308
+        area = (search[0], area[1], 308, area[3])
         return self.image_color_count(area, color=(74, 130, 148), threshold=221, count=20)
 
     def iter_aside(self):
@@ -302,6 +307,7 @@ class HospitalClue(HospitalUI):
                     return False
                 logger.info(f'is_in_clue -> {aside}')
                 self.device.click(aside)
+                self.interval_reset(HOSIPITAL_CLUE_CHECK, interval=2)
                 continue
             if self.handle_clue_exit():
                 continue
