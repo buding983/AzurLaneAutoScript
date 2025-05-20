@@ -366,6 +366,10 @@ class RewardDorm(UI):
                 logger.warning('Get dorm food timeout, probably because food is empty')
                 break
 
+            # Handle all popups
+            if self.ui_additional(get_ship=False):
+                continue
+
             if self.handle_info_bar():
                 continue
 
