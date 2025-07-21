@@ -1869,6 +1869,10 @@
       "help": "",
       "level120": "Lv.120",
       "level125": "Lv.125"
+    },
+    "Favourite": {
+      "name": "Awaken Favourite Ships Only",
+      "help": ""
     }
   },
   "GeneralShop": {
