@@ -1,4 +1,4 @@
-from .campaign_base import CampaignBase
+from .campaign_base import CampaignBaseTS as CampaignBase
 from module.map.map_base import CampaignMap
 from module.map.map_grids import SelectedGrids, RoadGrids
 from module.logger import logger
@@ -69,7 +69,6 @@ class Config:
     STAGE_INCREASE_CUSTOM = [
         'TS1 > TS2 > TS3 > TS4 > TS5 > TS6',
     ]
-    MAP_IS_ONE_TIME_STAGE = True
 
     INTERNAL_LINES_FIND_PEAKS_PARAMETERS = {
         'height': (80, 255 - 33),
