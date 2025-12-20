@@ -1792,14 +1792,6 @@
       }
     },
     "GemsFarming": {
-      "ChangeFlagship": {
-        "type": "select",
-        "value": "ship",
-        "option": [
-          "ship",
-          "ship_equip"
-        ]
-      },
       "CommonCV": {
         "type": "select",
         "value": "any",
@@ -1816,8 +1808,7 @@
         "value": "ship",
         "option": [
           "disabled",
-          "ship",
-          "ship_equip"
+          "ship"
         ]
       },
       "CommonDD": {
@@ -1845,25 +1836,25 @@
         "type": "select",
         "value": "campaign_main",
         "option": [
-          "event_20220428_cn",
-          "event_20230914_cn"
+          "event_20251023_cn",
+          "event_20251218_cn"
         ],
         "display": "hide",
         "option_cn": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_en": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_jp": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_tw": [
-          "event_20220428_cn"
+          "event_20251023_cn"
         ],
         "option_bold": [
-          "event_20220428_cn",
-          "event_20230914_cn"
+          "event_20251023_cn",
+          "event_20251218_cn"
         ]
       },
       "Mode": {
@@ -2126,24 +2117,24 @@
         "type": "state",
         "value": "campaign_main",
         "option": [
-          "event_20220428_cn",
-          "event_20230914_cn"
+          "event_20251023_cn",
+          "event_20251218_cn"
         ],
         "option_cn": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_en": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_jp": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_tw": [
-          "event_20220428_cn"
+          "event_20251023_cn"
         ],
         "option_bold": [
-          "event_20220428_cn",
-          "event_20230914_cn"
+          "event_20251023_cn",
+          "event_20251218_cn"
         ]
       },
       "Mode": {
@@ -2521,24 +2512,24 @@
         "type": "state",
         "value": "campaign_main",
         "option": [
-          "event_20220428_cn",
-          "event_20230914_cn"
+          "event_20251023_cn",
+          "event_20251218_cn"
         ],
         "option_cn": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_en": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_jp": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_tw": [
-          "event_20220428_cn"
+          "event_20251023_cn"
         ],
         "option_bold": [
-          "event_20220428_cn",
-          "event_20230914_cn"
+          "event_20251023_cn",
+          "event_20251218_cn"
         ]
       },
       "Mode": {
@@ -4242,24 +4233,24 @@
         "type": "state",
         "value": "campaign_main",
         "option": [
-          "event_20220428_cn",
-          "event_20230914_cn"
+          "event_20251023_cn",
+          "event_20251218_cn"
         ],
         "option_cn": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_en": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_jp": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_tw": [
-          "event_20220428_cn"
+          "event_20251023_cn"
         ],
         "option_bold": [
-          "event_20220428_cn",
-          "event_20230914_cn"
+          "event_20251023_cn",
+          "event_20251218_cn"
         ]
       },
       "Mode": {
@@ -4654,24 +4645,24 @@
         "type": "state",
         "value": "campaign_main",
         "option": [
-          "event_20220428_cn",
-          "event_20230914_cn"
+          "event_20251023_cn",
+          "event_20251218_cn"
         ],
         "option_cn": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_en": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_jp": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_tw": [
-          "event_20220428_cn"
+          "event_20251023_cn"
         ],
         "option_bold": [
-          "event_20220428_cn",
-          "event_20230914_cn"
+          "event_20251023_cn",
+          "event_20251218_cn"
         ]
       },
       "Mode": {
@@ -5066,24 +5057,24 @@
         "type": "state",
         "value": "campaign_main",
         "option": [
-          "event_20220428_cn",
-          "event_20230914_cn"
+          "event_20251023_cn",
+          "event_20251218_cn"
         ],
         "option_cn": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_en": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_jp": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_tw": [
-          "event_20220428_cn"
+          "event_20251023_cn"
         ],
         "option_bold": [
-          "event_20220428_cn",
-          "event_20230914_cn"
+          "event_20251023_cn",
+          "event_20251218_cn"
         ]
       },
       "Mode": {
@@ -5478,24 +5469,24 @@
         "type": "state",
         "value": "campaign_main",
         "option": [
-          "event_20220428_cn",
-          "event_20230914_cn"
+          "event_20251023_cn",
+          "event_20251218_cn"
         ],
         "option_cn": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_en": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_jp": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_tw": [
-          "event_20220428_cn"
+          "event_20251023_cn"
         ],
         "option_bold": [
-          "event_20220428_cn",
-          "event_20230914_cn"
+          "event_20251023_cn",
+          "event_20251218_cn"
         ]
       },
       "Mode": {
@@ -5880,24 +5871,24 @@
         "type": "state",
         "value": "campaign_main",
         "option": [
-          "event_20220428_cn",
-          "event_20230914_cn"
+          "event_20251023_cn",
+          "event_20251218_cn"
         ],
         "option_cn": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_en": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_jp": [
-          "event_20230914_cn"
+          "event_20251218_cn"
         ],
         "option_tw": [
-          "event_20220428_cn"
+          "event_20251023_cn"
         ],
         "option_bold": [
-          "event_20220428_cn",
-          "event_20230914_cn"
+          "event_20251023_cn",
+          "event_20251218_cn"
         ]
       },
       "Mode": {
