@@ -146,6 +146,9 @@ class AlasGUI(Frame):
         self.inst_cache = []
         self.load_home = False
         self.af_flag = False
+        # schedulers 区域鼠标状态
+        self._scheduler_last_action = 0.0
+        self._scheduler_idle_sec = 2.0
 
     @use_scope("aside", clear=True)
     def set_aside(self) -> None:
@@ -536,14 +539,52 @@ class AlasGUI(Frame):
             color_off="on",
             scope="dashboard_btn",
         )
+        # 创建隐藏的 input
+        put_input('_scheduler_mouse_action', value='0', style='display:none')
+        # 初始化 schedulers 鼠标状态监听
+        self._init_scheduler_mouse_listener()
+
         self.task_handler.add(switch_scheduler.g(), 1, True)
         self.task_handler.add(switch_log_scroll.g(), 1, True)
         if 'Maa' not in self.ALAS_ARGS:
             self.task_handler.add(switch_dashboard.g(), 1, True)
-        self.task_handler.add(self.alas_update_overview_task, 10, True)
+        self.task_handler.add(self._scheduled_overview_task, 10, True)
         if 'Maa' not in self.ALAS_ARGS:
             self.task_handler.add(self.alas_update_dashboard, 10, True)
         self.task_handler.add(log.put_log(self.alas), 0.25, True)
+
+    def _init_scheduler_mouse_listener(self):
+        run_js(r"""
+        (function () {
+            const el = document.getElementById('pywebio-scope-schedulers');
+            if (!el)
+                return;
+        
+            function setValue(name, value) {
+                const input = document.querySelector(`input[name="${name}"]`);
+                if (input) {
+                    input.value = value;
+                    input.dispatchEvent(new Event('change'));
+                }
+            }
+        
+            ['mouseenter', 'mousemove', 'mousedown', 'wheel', 'scroll'].forEach(evt => {
+                el.addEventListener(evt, () => setValue('_scheduler_mouse_action', Date.now()));
+            });
+        })();
+        """)
+
+    def _sync_scheduler_mouse_state(self):
+        val_action = pin['_scheduler_mouse_action']
+        if val_action is not None:
+            self._scheduler_last_action = int(val_action) / 1000
+
+    def _scheduler_allow_refresh(self) -> bool:   
+        # _scheduler_idle_sec秒无动作，允许刷新
+        if time.time() - self._scheduler_last_action > self._scheduler_idle_sec:
+            return True
+
+        return False
 
     def set_dashboard_display(self, b):
         self._log.set_dashboard_display(b)
@@ -717,6 +758,12 @@ class AlasGUI(Frame):
                     put_task(task)
             else:
                 put_text(t("Gui.Overview.Recent")).style("--overview-notask-text--")
+
+    def _scheduled_overview_task(self) -> None:
+        self._sync_scheduler_mouse_state()
+        if not self._scheduler_allow_refresh():
+            return
+        self.alas_update_overview_task()
 
     def _update_dashboard(self, num=None, groups_to_display=None):
         x = 0
