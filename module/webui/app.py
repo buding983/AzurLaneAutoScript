@@ -465,6 +465,8 @@ class AlasGUI(Frame):
                     put_scope("recent_tasks"),
                 ],
             )
+            # 创建隐藏的 input
+            put_input('_scheduler_mouse_action', value='0', style='display:none')
 
         switch_scheduler = BinarySwitchButton(
             label_on=t("Gui.Button.Stop"),
@@ -539,9 +541,9 @@ class AlasGUI(Frame):
             color_off="on",
             scope="dashboard_btn",
         )
-        # 创建隐藏的 input
-        put_input('_scheduler_mouse_action', value='0', style='display:none')
+
         # 初始化 schedulers 鼠标状态监听
+        self._scheduler_last_action = 0.0
         self._init_scheduler_mouse_listener()
 
         self.task_handler.add(switch_scheduler.g(), 1, True)
@@ -575,6 +577,8 @@ class AlasGUI(Frame):
         """)
 
     def _sync_scheduler_mouse_state(self):
+        if self._scheduler_last_action == 0:
+            return
         val_action = pin['_scheduler_mouse_action']
         if val_action is not None:
             self._scheduler_last_action = int(val_action) / 1000
@@ -678,6 +682,8 @@ class AlasGUI(Frame):
     def alas_update_overview_task(self) -> None:
         if not self.visible:
             return
+        if self._scheduler_last_action == 0:
+            self._scheduler_last_action = time.time()
         self.alas_config.load()
         self.alas_config.get_next_task()
 
