@@ -79,6 +79,7 @@ class Campaign(CampaignBase):
         return self.battle_default()
 
     def battle_6(self):
+        self.goto(E3)
         self.fleet_boss.pick_up_flare(C5)
 
         return self.fleet_boss.clear_boss()

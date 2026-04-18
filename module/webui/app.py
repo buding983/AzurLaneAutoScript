@@ -1,3 +1,4 @@
+import re
 import argparse
 import json
 import queue
@@ -7,8 +8,13 @@ from datetime import datetime
 from functools import partial
 from typing import Dict, List, Optional
 
+# Import fake module before import pywebio to avoid importing unnecessary module PIL
+from module.webui.fake_pil_module import import_fake_pil_module
+
+import_fake_pil_module()
+
 from pywebio import config as webconfig
-from pywebio.input import file_upload, input_group, input, select
+from pywebio.input import file_upload, input, input_group, select
 from pywebio.output import (
     Output,
     clear,
@@ -32,30 +38,22 @@ from pywebio.output import (
     use_scope,
 )
 from pywebio.pin import pin, pin_on_change
-from pywebio.session import (
-    go_app,
-    info,
-    local,
-    register_thread,
-    run_js,
-    set_env,
-    download,
-)
+from pywebio.session import download, go_app, info, local, register_thread, run_js, set_env
 
 import module.webui.lang as lang
 from module.config.config import AzurLaneConfig, Function
+from module.config.deep import deep_get, deep_iter, deep_set
 from module.config.env import IS_ON_PHONE_CLOUD
 from module.config.utils import (
     alas_instance,
     alas_template,
-    deep_get,
-    deep_iter,
-    deep_set,
     dict_to_kv,
     filepath_args,
     filepath_config,
     read_file,
 )
+from module.config.utils import time_delta
+from module.log_res.log_res import LogRes
 from module.logger import logger
 from module.ocr.rpc import start_ocr_server_process, stop_ocr_server_process
 from module.submodule.submodule import load_config
@@ -64,6 +62,7 @@ from module.webui.base import Frame
 from module.webui.discord_presence import close_discord_rpc, init_discord_rpc
 from module.webui.fastapi import asgi_app
 from module.webui.lang import _t, t
+from module.webui.patch import fix_py37_subprocess_communicate, patch_executor, patch_mimetype
 from module.webui.pin import put_input, put_select
 from module.webui.process_manager import ProcessManager
 from module.webui.remote_access import RemoteAccess
@@ -82,6 +81,7 @@ from module.webui.utils import (
     parse_pin_value,
     raise_exception,
     re_fullmatch,
+    to_pin_value,
 )
 from module.webui.widgets import (
     BinarySwitchButton,
@@ -93,13 +93,40 @@ from module.webui.widgets import (
     put_output,
 )
 
+patch_executor()
+patch_mimetype()
+fix_py37_subprocess_communicate()
 task_handler = TaskHandler()
+
+
+def timedelta_to_text(delta=None):
+    time_delta_name_suffix_dict = {
+        'Y': 'YearsAgo',
+        'M': 'MonthsAgo',
+        'D': 'DaysAgo',
+        'h': 'HoursAgo',
+        'm': 'MinutesAgo',
+        's': 'SecondsAgo',
+    }
+    time_delta_name_prefix = 'Gui.Overview.'
+    time_delta_name_suffix = 'NoData'
+    time_delta_display = ''
+    if isinstance(delta, dict):
+        for _key in delta:
+            if delta[_key]:
+                time_delta_name_suffix = time_delta_name_suffix_dict[_key]
+                time_delta_display = delta[_key]
+                break
+    time_delta_display = str(time_delta_display)
+    time_delta_name = time_delta_name_prefix + time_delta_name_suffix
+    return time_delta_display + t(time_delta_name)
 
 
 class AlasGUI(Frame):
     ALAS_MENU: Dict[str, Dict[str, List[str]]]
     ALAS_ARGS: Dict[str, Dict[str, Dict[str, Dict[str, str]]]]
     theme = "default"
+    _log = RichLog
 
     def initial(self) -> None:
         self.ALAS_MENU = read_file(filepath_args("menu", self.alas_mod))
@@ -115,21 +142,33 @@ class AlasGUI(Frame):
         self.alas_mod = "alas"
         self.alas_config = AzurLaneConfig("template")
         self.initial()
+        # rendered state cache
+        self.rendered_cache = []
+        self.inst_cache = []
+        self.load_home = False
+        self.af_flag = False
+        # schedulers 区域鼠标状态
+        self._scheduler_last_action = 0.0
+        self._scheduler_idle_sec = 2.0
 
     @use_scope("aside", clear=True)
     def set_aside(self) -> None:
         # TODO: update put_icon_buttons()
+
+        current_date = datetime.now().date()
+        if current_date.month == 4 and current_date.day == 1:
+            self.af_flag = True
+
         put_icon_buttons(
             Icon.DEVELOP,
             buttons=[{"label": t("Gui.Aside.Home"), "value": "Home", "color": "aside"}],
             onclick=[self.ui_develop],
         )
-        for name in alas_instance():
-            put_icon_buttons(
-                Icon.RUN,
-                buttons=[{"label": name, "value": name, "color": "aside"}],
-                onclick=self.ui_alas,
-            )
+        put_scope("aside_instance", [
+            put_scope(f"alas-instance-{i}", [])
+            for i, _ in enumerate(alas_instance())
+        ])
+        self.set_aside_status()
         put_icon_buttons(
             Icon.SETTING,
             buttons=[
@@ -141,6 +180,49 @@ class AlasGUI(Frame):
             ],
             onclick=[lambda: go_app("manage", new_window=False)],
         )
+
+
+    @use_scope("aside_instance")
+    def set_aside_status(self) -> None:
+        flag = True
+
+        def update(name, seq):
+            with use_scope(f"alas-instance-{seq}", clear=True):
+                icon_html = Icon.RUN
+                rendered_state = ProcessManager.get_manager(inst).state
+                if rendered_state == 1 and self.af_flag:
+                    icon_html = icon_html[:31] + ' anim-rotate' + icon_html[31:]
+                put_icon_buttons(
+                    icon_html,
+                    buttons=[{"label": name, "value": name, "color": "aside"}],
+                    onclick=self.ui_alas,
+                )
+            return rendered_state
+
+        if not len(self.rendered_cache) or self.load_home:
+            # Reload when add/delete new instance | first start app.py | go to HomePage (HomePage load call force reload)
+            flag = False
+            self.inst_cache.clear()
+            self.inst_cache = alas_instance()
+        if flag:
+            for index, inst in enumerate(self.inst_cache):
+                # Check for state change
+                state = ProcessManager.get_manager(inst).state
+                if state != self.rendered_cache[index]:
+                    self.rendered_cache[index] = update(inst, index)
+                    flag = False
+        else:
+            self.rendered_cache.clear()
+            clear("aside_instance")
+            for index, inst in enumerate(self.inst_cache):
+                self.rendered_cache.append(update(inst, index))
+            self.load_home = False
+        if not flag:
+            # Redraw lost focus, now focus on aside button
+            aside_name = get_localstorage("aside")
+            self.active_button("aside", aside_name)
+
+        return
 
     @use_scope("header_status")
     def set_status(self, state: int) -> None:
@@ -379,6 +461,16 @@ class AlasGUI(Frame):
                     put_scope("waiting_tasks"),
                 ],
             )
+            put_scope(
+                "recent",
+                [
+                    put_text(t("Gui.Overview.Recent")),
+                    put_html('<hr class="hr-group">'),
+                    put_scope("recent_tasks"),
+                ],
+            )
+            # 创建隐藏的 input
+            put_input('_scheduler_mouse_action', value='0', style='display:none')
 
         switch_scheduler = BinarySwitchButton(
             label_on=t("Gui.Button.Stop"),
@@ -392,22 +484,43 @@ class AlasGUI(Frame):
         )
 
         log = RichLog("log")
+        self._log = log
+        self._log.dashboard_arg_group = LogRes(self.alas_config).groups
 
         with use_scope("logs"):
-            put_scope(
-                "log-bar",
-                [
-                    put_text(t("Gui.Overview.Log")).style(
-                        "font-size: 1.25rem; margin: auto .5rem auto;"
-                    ),
-                    put_scope(
-                        "log-bar-btns",
-                        [
-                            put_scope("log_scroll_btn"),
-                        ],
-                    ),
-                ],
-            )
+            if 'Maa' in self.ALAS_ARGS:
+                put_scope(
+                    "log-bar",
+                    [
+                        put_text(t("Gui.Overview.Log")).style(
+                            "font-size: 1.25rem; margin: auto .5rem auto;"
+                        ),
+                        put_scope(
+                            "log-bar-btns",
+                            [
+                                put_scope("log_scroll_btn"),
+                            ],
+                        ),
+                    ],
+                ),
+            else:
+                put_scope(
+                    "log-bar",
+                    [
+                        put_text(t("Gui.Overview.Log")).style(
+                            "font-size: 1.25rem; margin: auto .5rem auto;"
+                        ),
+                        put_scope(
+                            "log-bar-btns",
+                            [
+                                put_scope("log_scroll_btn"),
+                                put_scope("dashboard_btn"),
+                            ],
+                        ),
+                        put_html('<hr class="hr-group">'),
+                        put_scope("dashboard"),
+                    ],
+                ),
             put_scope("log", [put_html("")])
 
         log.console.width = log.get_width()
@@ -422,11 +535,68 @@ class AlasGUI(Frame):
             color_off="off",
             scope="log_scroll_btn",
         )
+        switch_dashboard = BinarySwitchButton(
+            label_on=t("Gui.Button.DashboardON"),
+            label_off=t("Gui.Button.DashboardOFF"),
+            onclick_on=lambda: self.set_dashboard_display(False),
+            onclick_off=lambda: self.set_dashboard_display(True),
+            get_state=lambda: log.display_dashboard,
+            color_on="off",
+            color_off="on",
+            scope="dashboard_btn",
+        )
+
+        # 初始化 schedulers 鼠标状态监听
+        self._scheduler_last_action = 0.0
+        self._init_scheduler_mouse_listener()
 
         self.task_handler.add(switch_scheduler.g(), 1, True)
         self.task_handler.add(switch_log_scroll.g(), 1, True)
-        self.task_handler.add(self.alas_update_overview_task, 10, True)
+        if 'Maa' not in self.ALAS_ARGS:
+            self.task_handler.add(switch_dashboard.g(), 1, True)
+        self.task_handler.add(self._scheduled_overview_task, 10, True)
+        if 'Maa' not in self.ALAS_ARGS:
+            self.task_handler.add(self.alas_update_dashboard, 10, True)
         self.task_handler.add(log.put_log(self.alas), 0.25, True)
+
+    def _init_scheduler_mouse_listener(self):
+        run_js(r"""
+        (function () {
+            const el = document.getElementById('pywebio-scope-schedulers');
+            if (!el)
+                return;
+        
+            function setValue(name, value) {
+                const input = document.querySelector(`input[name="${name}"]`);
+                if (input) {
+                    input.value = value;
+                    input.dispatchEvent(new Event('change'));
+                }
+            }
+        
+            ['mouseenter', 'mousemove', 'mousedown', 'wheel', 'scroll'].forEach(evt => {
+                el.addEventListener(evt, () => setValue('_scheduler_mouse_action', Date.now()));
+            });
+        })();
+        """)
+
+    def _sync_scheduler_mouse_state(self):
+        if self._scheduler_last_action == 0:
+            return
+        val_action = pin['_scheduler_mouse_action']
+        if val_action is not None:
+            self._scheduler_last_action = int(val_action) / 1000
+
+    def _scheduler_allow_refresh(self) -> bool:   
+        # _scheduler_idle_sec秒无动作，允许刷新
+        if time.time() - self._scheduler_last_action > self._scheduler_idle_sec:
+            return True
+
+        return False
+
+    def set_dashboard_display(self, b):
+        self._log.set_dashboard_display(b)
+        self.alas_update_dashboard(True)
 
     def _init_alas_config_watcher(self) -> None:
         def put_queue(path, value):
@@ -444,8 +614,7 @@ class AlasGUI(Frame):
             try:
                 d = self.modified_config_queue.get(timeout=10)
                 config_name = self.alas_name
-                read = self.alas_config.read_file
-                write = self.alas_config.write_file
+                config_updater = self.alas_config
             except queue.Empty:
                 continue
             modified[d["name"]] = d["value"]
@@ -454,21 +623,26 @@ class AlasGUI(Frame):
                     d = self.modified_config_queue.get(timeout=1)
                     modified[d["name"]] = d["value"]
                 except queue.Empty:
-                    self._save_config(modified, config_name, read, write)
+                    self._save_config(modified, config_name, config_updater)
                     modified.clear()
                     break
 
     def _save_config(
-        self,
-        modified: Dict[str, str],
-        config_name: str,
-        read=State.config_updater.read_file,
-        write=State.config_updater.write_file,
+            self,
+            modified: Dict[str, str],
+            config_name: str,
+            config_updater: AzurLaneConfig = State.config_updater,
     ) -> None:
         try:
+            skip_time_record = False
             valid = []
             invalid = []
-            config = read(config_name)
+            config = config_updater.read_file(config_name)
+            n = datetime.now()
+            for p, v in deep_iter(config, depth=3):
+                if p[-1].endswith('un') and not isinstance(v, bool):
+                    if (v - n).days >= 31:
+                        deep_set(config, p, '')
             for k, v in modified.copy().items():
                 valuetype = deep_get(self.ALAS_ARGS, k + ".valuetype")
                 v = parse_pin_value(v, valuetype)
@@ -484,17 +658,11 @@ class AlasGUI(Frame):
                     deep_set(config, k, v)
                     modified[k] = v
                     valid.append(k)
-
-                    # update Emotion Record if Emotion Value is changed
-                    if "Emotion" in k and "Value" in k:
-                        k = k.split(".")
-                        k[-1] = k[-1].replace("Value", "Record")
-                        k = ".".join(k)
-                        v = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                        modified[k] = v
-                        deep_set(config, k, v)
-                        valid.append(k)
-                        pin["_".join(k.split("."))] = v
+                    for set_key, set_value in config_updater.save_callback(k, v):
+                        modified[set_key] = set_value
+                        deep_set(config, set_key, set_value)
+                        valid.append(set_key)
+                        pin["_".join(set_key.split("."))] = to_pin_value(set_value)
                 else:
                     modified.pop(k)
                     invalid.append(k)
@@ -511,13 +679,15 @@ class AlasGUI(Frame):
                 logger.info(
                     f"Save config {filepath_config(config_name)}, {dict_to_kv(modified)}"
                 )
-                write(config_name, config)
+                config_updater.write_file(config_name, config)
         except Exception as e:
             logger.exception(e)
 
     def alas_update_overview_task(self) -> None:
         if not self.visible:
             return
+        if self._scheduler_last_action == 0:
+            self._scheduler_last_action = time.time()
         self.alas_config.load()
         self.alas_config.get_next_task()
 
@@ -532,6 +702,27 @@ class AlasGUI(Frame):
             running = []
             pending = []
         waiting = self.alas_config.waiting_task
+        recent = self.alas_config.recent_task
+        def switch_enable(func: Function):
+            if func is None:
+                return
+            func.enable = not func.enable
+            self.alas_config.modified[f'{func.command}.Scheduler.Enable']=func.enable
+            self.alas_config.update()
+            create_switch_button(func)
+
+        def create_switch_button(func: Function, create=False):
+            if deep_get(self.ALAS_ARGS, keys=f'{func.command}.Scheduler.Enable.type') != 'checkbox':
+                return
+            swtich_scope=f"overview-task-{func.command}-switch"
+            if create:
+                put_scope(swtich_scope)
+            with use_scope(swtich_scope, clear=not create):
+                put_button(
+                    label=t("Gui.Button.Disable") if func.enable else t("Gui.Button.Enable"),
+                    onclick=lambda func=func: switch_enable(func),
+                    color="switch-"+("off" if func.enable else "on"),
+                )
 
         def put_task(func: Function):
             with use_scope(f"overview-task_{func.command}"):
@@ -542,6 +733,7 @@ class AlasGUI(Frame):
                     ],
                     size="auto auto",
                 )
+                create_switch_button(func, True)
                 put_button(
                     label=t("Gui.Button.Setting"),
                     onclick=lambda: self.alas_set_group(func.command),
@@ -551,6 +743,7 @@ class AlasGUI(Frame):
         clear("running_tasks")
         clear("pending_tasks")
         clear("waiting_tasks")
+        clear("recent_tasks")
         with use_scope("running_tasks"):
             if running:
                 for task in running:
@@ -569,6 +762,117 @@ class AlasGUI(Frame):
                     put_task(task)
             else:
                 put_text(t("Gui.Overview.NoTask")).style("--overview-notask-text--")
+        with use_scope("recent_tasks"):
+            if recent:
+                for task in recent:
+                    put_task(task)
+            else:
+                put_text(t("Gui.Overview.Recent")).style("--overview-notask-text--")
+
+    def _scheduled_overview_task(self) -> None:
+        self._sync_scheduler_mouse_state()
+        if not self._scheduler_allow_refresh():
+            return
+        self.alas_update_overview_task()
+
+    def _update_dashboard(self, num=None, groups_to_display=None):
+        x = 0
+        _num = 10000 if num is None else num
+        _arg_group = self._log.dashboard_arg_group if groups_to_display is None else groups_to_display
+        time_now = datetime.now().replace(microsecond=0)
+        for group_name in _arg_group:
+            group = deep_get(d=self.alas_config.data, keys=f'Dashboard.{group_name}')
+            if group is None:
+                continue
+
+            value = str(group['Value'])
+            if 'Limit' in group.keys():
+                value_limit = f' / {group["Limit"]}'
+                value_total = ''
+            elif 'Total' in group.keys():
+                value_total = f' ({group["Total"]})'
+                value_limit = ''
+            elif group_name == 'Pt':
+                value_limit = ' / ' + re.sub(r'[,.\'"，。]', '',
+                                             str(deep_get(self.alas_config.data, 'EventGeneral.EventGeneral.PtLimit')))
+                if value_limit == ' / 0':
+                    value_limit = ''
+            else:
+                value_limit = ''
+                value_total = ''
+            # value = value + value_limit + value_total
+
+            value_time = group['Record']
+            if value_time is None or value_time == datetime(2020, 1, 1, 0, 0, 0):
+                value_time = datetime(2023, 1, 1, 0, 0, 0)
+
+            # Handle time delta
+            if value_time == datetime(2023, 1, 1, 0, 0, 0):
+                value = 'None'
+                delta = timedelta_to_text()
+            else:
+                delta = timedelta_to_text(time_delta(value_time - time_now))
+            if group_name not in self._log.last_display_time.keys():
+                self._log.last_display_time[group_name] = ''
+            if self._log.last_display_time[group_name] == delta and not self._log.first_display:
+                continue
+            self._log.last_display_time[group_name] = delta
+
+            # if self._log.first_display:
+            # Handle width
+            # value_width = len(value) * 0.7 + 0.6 if value != 'None' else 4.5
+            # value_width = str(value_width/1.12) + 'rem' if self.is_mobile else str(value_width) + 'rem'
+            value_limit = '' if value == 'None' else value_limit
+            # limit_width = len(value_limit) * 0.7
+            # limit_width = str(limit_width) + 'rem'
+            value_total = '' if value == 'None' else value_total
+            limit_style = '--dashboard-limit--' if value_limit else '--dashboard-total--'
+            value_limit = value_limit if value_limit else value_total
+            # Handle dot color
+            _color = f"""background-color:{deep_get(d=group, keys='Color').replace('^', '#')}"""
+            color = f'<div class="status-point" style={_color}>'
+            with use_scope(group_name, clear=True):
+                put_row(
+                    [
+                        put_html(color),
+                        put_scope(
+                            f"{group_name}_group",
+                            [
+                                put_column(
+                                    [
+                                        put_row(
+                                            [
+                                                put_text(value
+                                                         ).style(f'--dashboard-value--'),
+                                                put_text(value_limit
+                                                         ).style(limit_style),
+                                            ],
+                                        ).style('grid-template-columns:min-content auto;align-items: baseline;'),
+                                        put_text(
+                                            t(f'Gui.Overview.{group_name}') + " - " + delta
+                                        ).style('---dashboard-help--')
+                                    ],
+                                    size="auto auto",
+                                ),
+                            ],
+                        ),
+                    ],
+                    size="20px 1fr"
+                ).style("height: 1fr"),
+            x += 1
+            if x >= _num:
+                break
+        if self._log.first_display:
+            self._log.first_display = False
+
+    def alas_update_dashboard(self, _clear=False):
+        if not self.visible:
+            return
+        with use_scope("dashboard", clear=_clear):
+            if not self._log.display_dashboard:
+                self._update_dashboard(num=4, groups_to_display=['Oil', 'Coin', 'Gem', 'Pt'])
+            elif self._log.display_dashboard:
+                self._update_dashboard()
 
     @use_scope("content", clear=True)
     def alas_daemon_overview(self, task: str) -> None:
@@ -888,17 +1192,17 @@ class AlasGUI(Frame):
     def dev_utils(self) -> None:
         self.init_menu(name="Utils")
         self.set_title(t("Gui.MenuDevelop.Utils"))
-        put_button(label="Raise exception", onclick=raise_exception)
+        put_button(label=t("Gui.MenuDevelop.RaiseException"), onclick=raise_exception)
 
         def _force_restart():
             if State.restart_event is not None:
-                toast("Alas will restart in 3 seconds", duration=0, color="error")
+                toast(t("Gui.Toast.AlasRestart"), duration=0, color="error")
                 clearup()
                 State.restart_event.set()
             else:
-                toast("Reload not enabled", color="error")
+                toast(t("Gui.Toast.ReloadEnabled"), color="error")
 
-        put_button(label="Force restart", onclick=_force_restart)
+        put_button(label=t("Gui.MenuDevelop.ForceRestart"), onclick=_force_restart)
 
     @use_scope("content", clear=True)
     def dev_remote(self) -> None:
@@ -937,8 +1241,8 @@ class AlasGUI(Frame):
                     "--loading-border-fill--"
                 )
                 if (
-                    State.deploy_config.EnableRemoteAccess
-                    and State.deploy_config.Password
+                        State.deploy_config.EnableRemoteAccess
+                        and State.deploy_config.Password
                 ):
                     put_text(t("Gui.Remote.NotRunning"), scope="remote_state")
                 else:
@@ -1054,6 +1358,7 @@ class AlasGUI(Frame):
 
     def show(self) -> None:
         self._show()
+        self.load_home = True
         self.set_aside()
         self.init_aside(name="Home")
         self.dev_set_menu()
@@ -1201,6 +1506,7 @@ class AlasGUI(Frame):
         )
 
         self.task_handler.add(self.state_switch.g(), 2)
+        self.task_handler.add(self.set_aside_status, 2)
         self.task_handler.add(visibility_state_switch.g(), 15)
         self.task_handler.add(update_switch.g(), 1)
         self.task_handler.start()
@@ -1381,8 +1687,8 @@ def startup():
     if State.deploy_config.StartOcrServer:
         start_ocr_server_process(State.deploy_config.OcrServerPort)
     if (
-        State.deploy_config.EnableRemoteAccess
-        and State.deploy_config.Password is not None
+            State.deploy_config.EnableRemoteAccess
+            and State.deploy_config.Password is not None
     ):
         task_handler.add(RemoteAccess.keep_ssh_alive(), 60)
 
@@ -1441,6 +1747,9 @@ def app():
     logger.attr("Password", True if key else False)
     logger.attr("CDN", cdn)
     logger.attr("IS_ON_PHONE_CLOUD", IS_ON_PHONE_CLOUD)
+
+    from deploy.atomic import atomic_failure_cleanup
+    atomic_failure_cleanup('./config')
 
     def index():
         if key is not None and not login(key):

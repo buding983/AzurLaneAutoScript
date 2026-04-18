@@ -73,6 +73,13 @@ footer {
     margin: 0;
 }
 
+.btn-switch-off,
+.btn-switch-on {
+    border-radius: 0;
+    margin: 0;
+    margin-right: 5px;
+}
+
 .btn-navigator {
     border-radius: 0;
     margin: 0 !important;
@@ -131,6 +138,13 @@ footer {
 .hr-task-group-text {
     margin: 0 0.5rem;
     font-size: 0.875rem;
+}
+
+.status-point {
+    margin: 37% 50% 63% 50%;
+    width: .75rem;
+    height: .75rem;
+    border-radius: 50%;
 }
 
 input[type="checkbox"] {
@@ -314,6 +328,16 @@ pre.rich-traceback-code {
     margin: 0;
 }
 
+.anim-rotate {
+    animation: rotate-keyframes 0.4s linear infinite
+}
+
+@keyframes rotate-keyframes {
+    100% {
+        transform: rotate(360deg)
+    }
+}
+
 #pywebio-scope-contents {
     margin-top: 0;
     overflow-y: auto;
@@ -373,6 +397,7 @@ pre.rich-traceback-code {
 #pywebio-scope-running,
 #pywebio-scope-pending,
 #pywebio-scope-waiting,
+#pywebio-scope-recent,
 #pywebio-scope-scheduler-bar,
 #pywebio-scope-log-bar,
 #pywebio-scope-log,
@@ -389,10 +414,30 @@ pre.rich-traceback-code {
     justify-content: space-between;
 }
 
+#pywebio-scope-log-bar {
+    flex-wrap: wrap;
+}
+
 #pywebio-scope-log-bar-btns {
     display: grid;
     grid-auto-flow: column;
 }
+
+#pywebio-scope-log-bar .hr-group {
+    width: 100%;
+}
+
+#pywebio-scope-dashboard {
+    font-weight: 400;
+    width: 100%;
+    display: grid;
+    grid-auto-flow: row;
+    grid-template-columns: repeat(auto-fit,minmax(10rem,1fr));
+}
+
+#pywebio-scope-dashboard .form-control{
+    padding: 0 0 0;
+    }
 
 #pywebio-scope-log {
     line-height: 1.2;
@@ -403,7 +448,8 @@ pre.rich-traceback-code {
 
 #pywebio-scope-running,
 #pywebio-scope-pending,
-#pywebio-scope-waiting {
+#pywebio-scope-waiting,
+#pywebio-scope-recent {
     display: grid;
     grid-auto-flow: row;
     grid-template-rows: auto auto 1fr;
@@ -411,7 +457,8 @@ pre.rich-traceback-code {
 
 #pywebio-scope-running > p,
 #pywebio-scope-pending > p,
-#pywebio-scope-waiting > p {
+#pywebio-scope-waiting > p,
+#pywebio-scope-recent > p {
     font-size: 1.25rem;
     font-weight: 500;
     margin: 0 0.625rem 0 !important;
@@ -419,7 +466,8 @@ pre.rich-traceback-code {
 
 #pywebio-scope-running_tasks,
 #pywebio-scope-pending_tasks,
-#pywebio-scope-waiting_tasks {
+#pywebio-scope-waiting_tasks,
+#pywebio-scope-recent_tasks {
     overflow-y: auto;
     height: 100%;
 }
@@ -457,8 +505,7 @@ pre.rich-traceback-code {
     display: grid;
 }
 
-.bs-title-option,
-.form-check-input[id*="ch_S"] {
+.bs-title-option {
     display: none;
 }
 
@@ -513,4 +560,50 @@ pre.rich-traceback-code {
     width: 1.5rem;
     height: 1.5rem;
     border: .2em solid currentColor;
+}
+
+/**[style*="--dashboard-value--"] {*/
+/*    font-size: 1.3rem;*/
+/*    font-weight: 400;*/
+/*    margin: 0 0 -0.2rem 0.6rem !important;*/
+/*    overflow-wrap: break-word;*/
+/*    overflow: visible;*/
+/*    border-bottom: 0;*/
+/*}*/
+
+*[style*="--dashboard-value--"] {
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin: 0 0 0 0.6rem !important;
+    font-family:
+             "Arial",
+             serif;
+}
+
+*[style*="--dashboard-total--"] {
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin: 0 0 0 0.15rem !important;
+    font-family:
+             "Arial",
+             serif;
+}
+
+*[style*="--dashboard-help--"] {
+    font-size: .8rem;
+    margin: 0 0 0 0.6rem !important;
+    font-family:
+             "Arial",
+             serif;
+}
+
+*[style*="--dashboard-limit--"] {
+    font-weight: 400;
+    font-size: .9rem;
+    margin: 0 0 0 0 !important;
+    vertical-align: text-bottom;
+    overflow-wrap: normal;
+    font-family:
+             "Arial",
+             serif;
 }

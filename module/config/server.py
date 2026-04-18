@@ -14,6 +14,7 @@ VALID_PACKAGE = {
 VALID_CHANNEL_PACKAGE = {
     # App stores
     'com.bilibili.blhx.huawei': ('cn', '华为'),
+    'com.bilibili.blhx.honor': ('cn', '荣耀'),
     'com.bilibili.blhx.mi': ('cn', '小米'),
     'com.tencent.tmgp.bilibili.blhx': ('cn', '腾讯应用宝'),
     'com.bilibili.blhx.baidu': ('cn', '百度'),
@@ -36,6 +37,35 @@ VALID_CHANNEL_PACKAGE = {
     # Tw
     'com.hkmanjuu.azurlane.gp.mc': ('tw', 'MyCard'),
 }
+DICT_PACKAGE_TO_ACTIVITY = {
+    # com.manjuu.azurlane.MainActivity
+    # VALID_PACKAGE
+    'com.bilibili.azurlane': 'com.manjuu.azurlane.MainActivity',
+    'com.YoStarEN.AzurLane': 'com.manjuu.azurlane.PrePermissionActivity',
+    'com.YoStarJP.AzurLane': 'com.manjuu.azurlane.PrePermissionActivity',
+    'com.hkmanjuu.azurlane.gp': 'com.manjuu.azurlane.PrePermissionActivity',
+    # App stores
+    'com.bilibili.blhx.huawei': 'com.manjuu.azurlane.SplashActivity',
+    'com.bilibili.blhx.mi': 'com.manjuu.azurlane.SplashActivity',
+    'com.tencent.tmgp.bilibili.blhx': 'com.manjuu.azurlane.SplashActivity',
+    'com.bilibili.blhx.baidu': 'com.manjuu.azurlane.SplashActivity',
+    'com.bilibili.blhx.qihoo': 'com.manjuu.azurlane.SplashActivity',
+    'com.bilibili.blhx.nearme.gamecenter': 'com.manjuu.azurlane.SplashActivity',
+    'com.bilibili.blhx.vivo': 'com.manjuu.azurlane.SplashActivity',
+    'com.bilibili.blhx.mz': 'com.manjuu.azurlane.SplashActivity',
+    'com.bilibili.blhx.dl': 'com.manjuu.azurlane.SplashActivity',
+    'com.bilibili.blhx.lenovo': 'com.manjuu.azurlane.SplashActivity',
+
+    # 3rd party gaming platforms
+    'com.bilibili.blhx.uc': 'com.manjuu.azurlane.SplashActivity',
+    'com.bilibili.blhx.mzw': 'com.manjuu.azurlane.SplashActivity',
+    'com.yiwu.blhx.yx15': 'com.manjuu.azurlane.SplashActivity',
+    'com.bilibili.blhx.m4399': 'com.manjuu.azurlane.SplashActivity',
+    'com.bilibili.blhx.bilibiliMove': 'com.manjuu.azurlane.SplashActivity',
+
+    # Tw
+    'com.hkmanjuu.azurlane.gp.mc': 'com.manjuu.azurlane.PrePermissionActivity',
+}
 VALID_SERVER_LIST = {
     'cn_android': [
         '莱茵演习', '巴巴罗萨', '霸王行动', '冰山行动', '彩虹计划',
@@ -43,7 +73,8 @@ VALID_SERVER_LIST = {
         '杜立特空袭', '地狱犬行动', '开罗宣言', '奥林匹克行动',
         '小王冠行动', '波茨坦公告', '白色方案', '瓦尔基里行动',
         '曼哈顿计划', '八月风暴', '秋季旅行', '水星行动', '莱茵河卫兵',
-        '北极光计划', '长戟计划'
+        '北极光计划', '长戟计划', '暴雨行动', '水仙行动', '冬月计划',
+        '长弓计划', '裁决协议',
     ],
     'cn_ios': [
         '夏威夷', '珊瑚海', '中途岛', '铁底湾', '所罗门', '马里亚纳',

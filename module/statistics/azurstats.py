@@ -10,7 +10,7 @@ from requests.adapters import HTTPAdapter
 
 from module.base.utils import save_image
 from module.config.config import AzurLaneConfig
-from module.config.utils import deep_get
+from module.config.deep import deep_get
 from module.exception import ScriptError
 from module.logger import logger
 from module.statistics.utils import pack
@@ -67,7 +67,10 @@ class DropImage:
         return len(self.images)
 
     def __bool__(self):
-        return self.save or self.upload
+        # Uncomment these if stats service re-run in the future
+        # return self.save or self.upload
+
+        return self.save
 
     def __enter__(self):
         return self
@@ -161,7 +164,7 @@ class AzurStats:
                     return False
 
         logger.warning(f'Image upload failed, unexpected server returns, '
-                       f'status_code: {resp.status_code}, returns: {resp.text}')
+                       f'status_code: {resp.status_code}, returns: {resp.text[:500]}')
         return False
 
     def _save(self, image, genre, filename):
@@ -217,10 +220,12 @@ class AzurStats:
             save_thread = threading.Thread(
                 target=self._save, args=(image, genre, filename))
             save_thread.start()
-        if upload:
-            upload_thread = threading.Thread(
-                target=self._upload, args=(image, genre, filename))
-            upload_thread.start()
+
+        # Uncomment these if stats service re-run in the future
+        # if upload:
+        #     upload_thread = threading.Thread(
+        #         target=self._upload, args=(image, genre, filename))
+        #     upload_thread.start()
 
         return True
 

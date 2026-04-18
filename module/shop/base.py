@@ -1,27 +1,30 @@
 import re
 
+import numpy as np
+
 from module.base.button import ButtonGrid
-from module.base.decorator import cached_property, Config
+from module.base.decorator import Config, cached_property
 from module.base.filter import Filter
 from module.base.timer import Timer
-from module.combat.assets import GET_ITEMS_1, GET_SHIP, GET_ITEMS_3
+from module.combat.assets import GET_ITEMS_1, GET_ITEMS_3, GET_SHIP
 from module.logger import logger
 from module.shop.assets import *
 from module.shop.shop_select_globals import *
-from module.statistics.item import ItemGrid
+from module.statistics.item import Item, ItemGrid
 from module.tactical.tactical_class import Book
 from module.ui.ui import UI
 
 FILTER_REGEX = re.compile(
     '^(array|book|box|bulin|cat'
     '|chip|coin|cube|drill|food'
-    '|plate|retrofit|pr|dr'
+    '|plate|retrofit|pr|dr|specializedcore'
     '|logger|tuning'
-    '|hecombatplan|fragment'
-    '|albacore|bataan|bluegill|carabiniere|casablanca|contedicavour|dukeofyork|echo'
-    '|eldridge|grenville|hibiki|hunter|kinggeorgev|kinu|kuroshio|lemalinmuse'
-    '|letemeraire|littorio|newcastle|oyashio|quincy|ryuujou|sanjuan|sheffieldmuse'
-    '|trento|vincennes|z26|z28|z36'
+    '|hecombatplan|fragment|hiddenzonedatalogger'
+    '|albacore|bataan|bearn|bluegill|carabiniere|casablanca|contedicavour|dukeofyork'
+    '|echo|eldridge|gangut|glorious|grenville|hibiki|hunter|icarus'
+    '|kawakaze|kinggeorgev|kinu|kuroshio|lagalissonniere|lemalinmuse|letemeraire|littorio'
+    '|mikuma|minsk|newcastle|oyashio|quincy|ryuujou|sanjuan|sheffieldmuse'
+    '|trento|u37|vincennes|z24|z26|z28|z36'
     ')'
 
     '(neptune|monarch|ibuki|izumo|roon|saintlouis'
@@ -32,6 +35,7 @@ FILTER_REGEX = re.compile(
     '|red|blue|yellow'
     '|general|gun|torpedo|antiair|plane|wild'
     '|dd|cl|bb|cv'
+    '|iris'
     '|abyssal|archive|obscure|unlock'
     '|combat|offense|survival)?'
 
@@ -41,13 +45,23 @@ FILTER_ATTR = ('group', 'sub_genre', 'tier')
 FILTER = Filter(FILTER_REGEX, FILTER_ATTR)
 
 
+class ShopItem_250814(Item):
+    """
+    Calculation result of unsold ship_T2 is 0.36, so 0.3 is taken as threshold,
+    result of sold product is < 0.2
+    """
+
+    def predict_valid(self):
+        mean = np.mean(np.max(self.image, axis=2) > 139)
+        return mean > 0.3
+
+
 class ShopItemGrid(ItemGrid):
     def predict(self, image, name=True, amount=True, cost=False, price=False, tag=False):
         """
         Define new attributes to predicted Item obj for shop item filtering
         """
         super().predict(image, name, amount, cost, price, tag)
-
         for item in self.items:
             # Set defaults
             item.group, item.sub_genre, item.tier = None, None, None
@@ -84,6 +98,19 @@ class ShopItemGrid(ItemGrid):
         return self.items
 
 
+class ShopItemGrid_250814(ShopItemGrid):
+    item_class = ShopItem_250814
+
+    def get_soldout_count(self, image):
+        count = 0
+        for button in self.grids.buttons:
+            item = self.item_class(image, button)
+            if not item.is_valid:
+                count += 1
+        logger.attr('Item soldout', count)
+        return count
+
+
 class ShopBase(UI):
     _currency = 0
     shop_template_folder = ''
@@ -97,13 +124,15 @@ class ShopBase(UI):
         return ''
 
     @cached_property
+    @Config.when(SERVER=None)
     def shop_grid(self):
         """
+        New UI in 2025-08-14
         Returns:
             ButtonGrid:
         """
         shop_grid = ButtonGrid(
-            origin=(476, 246), delta=(156, 213), button_shape=(98, 98), grid_shape=(5, 2), name='SHOP_GRID')
+            origin=(265, 238), delta=(169, 223), button_shape=(64, 64), grid_shape=(5, 2), name='SHOP_GRID')
         return shop_grid
 
     def shop_items(self):

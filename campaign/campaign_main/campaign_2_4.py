@@ -1,5 +1,5 @@
 from campaign.campaign_main.campaign_2_1 import Config as ConfigBase
-from module.campaign.campaign_base import CampaignBase
+from .campaign_2_base import CampaignBase
 from module.logger import logger
 from module.map.map_base import CampaignMap
 from module.map.map_grids import RoadGrids, SelectedGrids
@@ -32,7 +32,7 @@ A3, B3, C3, D3, E3, F3, G3, \
 A4, B4, C4, D4, E4, F4, G4, \
     = MAP.flatten()
 
-road_main = RoadGrids([[F2, F1], [F2, E1], [C2, C3, B4]])
+road_main = RoadGrids([[F2, F1], [F2, E1]])
 
 class Config(ConfigBase):
     # Don't know why 2-4 is slimmer

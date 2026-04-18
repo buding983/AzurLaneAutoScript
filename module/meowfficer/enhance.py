@@ -9,11 +9,14 @@ from module.ui.assets import MEOWFFICER_GOTO_DORMMENU
 from module.ui.page import page_meowfficer
 
 MEOWFFICER_SELECT_GRID = ButtonGrid(
-    origin=(770, 245), delta=(130, 147), button_shape=(70, 20), grid_shape=(4, 3),
+    origin=(751, 237), delta=(130, 147), button_shape=(70, 20), grid_shape=(4, 3),
     name='MEOWFFICER_SELECT_GRID')
 MEOWFFICER_FEED_GRID = ButtonGrid(
-    origin=(818, 212), delta=(130, 147), button_shape=(30, 30), grid_shape=(4, 3),
+    origin=(783, 189), delta=(130, 148), button_shape=(46, 46), grid_shape=(4, 3),
     name='MEOWFFICER_FEED_GRID')
+MEOWFICER_FEED_LEVEL_GRID = ButtonGrid(
+    origin=(738, 211), delta=(130, 148), button_shape=(20, 22), grid_shape=(4, 3),
+    name='MEOWFFICER_FEED_LEVEL_GRID')
 MEOWFFICER_FEED = DigitCounter(OCR_MEOWFFICER_FEED, letter=(131, 121, 123), threshold=64)
 
 
@@ -85,7 +88,26 @@ class MeowfficerEnhance(MeowfficerBase):
             list(Button)
         """
         clickable = []
-        for index, button in enumerate(MEOWFFICER_FEED_GRID.buttons):
+
+        # Reset invalid value of MeowfficerTrain_MaxFeedLevel
+        # it can work without this code, just for rigor
+        reset_max_feed_level = -1
+        if self.config.MeowfficerTrain_MaxFeedLevel < 1:
+            reset_max_feed_level = 1
+        elif self.config.MeowfficerTrain_MaxFeedLevel > 30:
+            reset_max_feed_level = 30
+
+        if -1 != reset_max_feed_level:
+            logger.warning(f"Condition '1 <= MeowfficerTrain_MaxFeedLevel <= 30' needs to be satisfied, "
+                           f'now MeowfficerTrain_MaxFeedLevel is {self.config.MeowfficerTrain_MaxFeedLevel}, '
+                           f'reset to {reset_max_feed_level}')
+            self.config.MeowfficerTrain_MaxFeedLevel = reset_max_feed_level
+
+        # Get all the cat levels ready for enhance
+        feed_level_list = Digit(MEOWFICER_FEED_LEVEL_GRID.buttons, letter=(49, 48, 49),
+                                name='FEED_MEOWFFICER_LEVEL').ocr(self.device.image)
+
+        for index, (button, level) in enumerate(zip(MEOWFFICER_FEED_GRID.buttons, feed_level_list)):
             # Exit if 11th button; no need to validate as not
             # possible to click beyond this point
             if index >= 10:
@@ -98,6 +120,11 @@ class MeowfficerEnhance(MeowfficerBase):
             # Continue onto next if button
             # already selected (green check mark)
             if self.image_color_count(button, color=(95, 229, 108), threshold=221, count=150):
+                continue
+
+            # Continue onto next If the target Meowfficer's level
+            # is greater than the maximum feed level set
+            if level > self.config.MeowfficerTrain_MaxFeedLevel:
                 continue
 
             # Neither base case, so presume
@@ -136,14 +163,14 @@ class MeowfficerEnhance(MeowfficerBase):
             else:
                 self.device.screenshot()
 
-            # Scan for feed, exit if none
-            buttons = self.meow_feed_scan()
-            if not len(buttons):
-                break
-
             # Exit if maximum clicked
             current, remain, total = MEOWFFICER_FEED.ocr(self.device.image)
             if not remain:
+                break
+
+            # Scan for feed, exit if none
+            buttons = self.meow_feed_scan()
+            if not len(buttons):
                 break
 
             # Else click each button to

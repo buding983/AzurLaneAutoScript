@@ -1,14 +1,16 @@
 import re
+import typing as t
 from copy import deepcopy
 
 from cached_property import cached_property
 
 from deploy.utils import DEPLOY_TEMPLATE, poor_yaml_read, poor_yaml_write
 from module.base.timer import timer
+from module.config.deep import deep_default, deep_get, deep_iter, deep_pop, deep_set
 from module.config.env import IS_ON_PHONE_CLOUD
-from module.config.redirect_utils.utils import *
-from module.config.server import to_server, to_package, VALID_PACKAGE, VALID_CHANNEL_PACKAGE, VALID_SERVER_LIST
+from module.config.server import VALID_CHANNEL_PACKAGE, VALID_PACKAGE, VALID_SERVER_LIST, to_package, to_server
 from module.config.utils import *
+from module.config.redirect_utils.utils import *
 
 CONFIG_IMPORT = '''
 import datetime
@@ -35,6 +37,7 @@ RAIDS = ['Raid', 'RaidDaily']
 WAR_ARCHIVES = ['WarArchives']
 COALITIONS = ['Coalition', 'CoalitionSp']
 MARITIME_ESCORTS = ['MaritimeEscort']
+HOSPITAL = ['Hospital']
 
 
 class Event:
@@ -62,6 +65,12 @@ class Event:
 
     def __eq__(self, other):
         return str(self) == str(other)
+
+    def __lt__(self, other):
+        return str(self) < str(other)
+
+    def __hash__(self):
+        return hash(str(self))
 
 
 class ConfigGenerator:
@@ -141,6 +150,15 @@ class ConfigGenerator:
         return read_file(filepath_argument('gui'))
 
     @cached_property
+    def dashboard(self):
+        """
+        <dashboard>
+          - <group>
+        """
+        return read_file(filepath_argument('dashboard'))
+
+
+    @cached_property
     @timer
     def args(self):
         """
@@ -154,10 +172,12 @@ class ConfigGenerator:
         """
         # Construct args
         data = {}
-        for path, groups in deep_iter(self.task, depth=3):
-            if 'tasks' not in path:
+        # Add dashboard to args
+        dashboard_and_task = {**self.dashboard,**self.task}
+        for path, groups in deep_iter(dashboard_and_task, depth=3):
+            if 'tasks' not in path and 'Dashboard' not in path:
                 continue
-            task = path[2]
+            task = path[2] if 'tasks' in path else path[0]
             # Add storage to all task
             groups.append('Storage')
             for group in groups:
@@ -199,8 +219,11 @@ class ConfigGenerator:
             if not check_override(p, v):
                 continue
             if isinstance(v, dict):
-                if deep_get(v, keys='type') in ['lock']:
-                    deep_default(v, keys='display', value="disabled")
+                typ = v.get('type')
+                if typ == 'state':
+                    pass
+                elif typ == 'lock':
+                    pass
                 elif deep_get(v, keys='value') is not None:
                     deep_default(v, keys='display', value='hide')
                 for arg_k, arg_v in v.items():
@@ -296,7 +319,7 @@ class ConfigGenerator:
                 name = event.__getattribute__(server)
                 if name:
                     deep_default(events, keys=event.directory, value=name)
-        for event in self.event:
+        for event in sorted(self.event):
             name = events.get(event.directory, event.directory)
             deep_set(new, keys=f'Campaign.Event.{event.directory}', value=name)
         # Package names
@@ -372,13 +395,39 @@ class ConfigGenerator:
         Returns:
             list[Event]: From latest to oldest
         """
+
+        def calc_width(text):
+            return len(text) + len(re.findall(
+                r'[\u3000-\u30ff\u3400-\u4dbf\u4e00-\u9fff、！（）]', text))
+
+        lines = []
+        data_lines = []
+        data_widths = []
+        column_width = [4] * 7  # `:---`
         events = []
         with open('./campaign/Readme.md', encoding='utf-8') as f:
             for text in f.readlines():
-                if re.search(r'\d{8}', text):
-                    event = Event(text)
-                    events.append(event)
-
+                if not re.search(r'^\|.+\|$', text):
+                    # not a table line
+                    lines.append(text)
+                elif re.search(r'^.*\-{3,}.*$', text):
+                    # is a delimiter line
+                    continue
+                else:
+                    line_entries = [x.strip() for x in text.strip('| \n').split('|')]
+                    data_lines.append(line_entries)
+                    data_width = [calc_width(string) for string in line_entries]
+                    data_widths.append(data_width)
+                    column_width = [max(l1, l2) for l1, l2 in zip(column_width, data_width)]
+                    if re.search(r'\d{8}', text):
+                        event = Event(text)
+                        events.append(event)
+        for i, (line, old_width) in enumerate(zip(data_lines, data_widths)):
+            lines.append('| ' + ' | '.join([cell + ' ' * (width - length) for cell, width, length in zip(line, column_width, old_width)]) + ' |\n')
+            if i == 0:
+                lines.append('| ' + ' | '.join([':' + '-' * (width - 1) for width in column_width]) + ' |\n')
+        with open('./campaign/Readme.md', 'w', encoding='utf-8') as f:
+            f.writelines(lines)
         return events[::-1]
 
     def insert_event(self):
@@ -389,35 +438,47 @@ class ConfigGenerator:
                                   v
                    args.json -----+-----> args.json
         """
-        for event in self.event:
-            for server in ARCHIVES_PREFIX.keys():
+        for server in ARCHIVES_PREFIX.keys():
+            for event in self.event:
                 name = event.__getattribute__(server)
 
                 def insert(key):
-                    opts = deep_get(self.args, keys=f'{key}.Campaign.Event.option')
+                    opts = deep_get(self.args, keys=f'{key}.Campaign.Event.option_{server}', default=[])
                     if event not in opts:
                         opts.append(event)
-                    if name:
-                        deep_default(self.args, keys=f'{key}.Campaign.Event.{server}', value=event)
+                    deep_set(self.args, keys=f'{key}.Campaign.Event.option_{server}', value=opts)
 
                 if name:
                     if event.is_raid:
-                        for task in RAIDS:
-                            insert(task)
+                        if not hasattr(self, f'_{server}_latest_raid_date'):
+                            setattr(self, f'_{server}_latest_raid_date', int(event.date))
+                        if int(event.date) == getattr(self, f'_{server}_latest_raid_date'):
+                            for task in RAIDS:
+                                insert(task)
                     elif event.is_war_archives:
                         for task in WAR_ARCHIVES:
                             insert(task)
                     elif event.is_coalition:
-                        for task in COALITIONS:
-                            insert(task)
+                        if not hasattr(self, f'_{server}_latest_coalition_date'):
+                            setattr(self, f'_{server}_latest_coalition_date', int(event.date))
+                        if int(event.date) == getattr(self, f'_{server}_latest_coalition_date'):
+                            for task in COALITIONS:
+                                insert(task)
                     else:
-                        for task in EVENTS + GEMS_FARMINGS:
-                            insert(task)
+                        if not hasattr(self, f'_{server}_latest_event_date'):
+                            setattr(self, f'_{server}_latest_event_date', int(event.date))
+                        if int(event.date) == getattr(self, f'_{server}_latest_event_date'):
+                            for task in EVENTS + GEMS_FARMINGS:
+                                insert(task)
 
-        # Remove campaign_main from event list
         for task in EVENTS + GEMS_FARMINGS + WAR_ARCHIVES + RAIDS + COALITIONS:
-            options = deep_get(self.args, keys=f'{task}.Campaign.Event.option')
-            options = [option for option in options if option != 'campaign_main']
+            latest = {}
+            for server in ARCHIVES_PREFIX.keys():
+                latest[server] = deep_get(self.args, keys=f'{task}.Campaign.Event.option_{server}', default=[])
+            options = set().union(*latest.values())
+            options = sorted([option for option in options if option != 'campaign_main'])
+            if task not in WAR_ARCHIVES:
+                deep_set(self.args, keys=f'{task}.Campaign.Event.option_bold', value=options)
             deep_set(self.args, keys=f'{task}.Campaign.Event.option', value=options)
 
     @staticmethod
@@ -425,7 +486,7 @@ class ConfigGenerator:
         template = poor_yaml_read(DEPLOY_TEMPLATE)
         cn = {
             'Repository': 'git://git.lyoko.io/AzurLaneAutoScript',
-            'PypiMirror': 'https://pypi.tuna.tsinghua.edu.cn/simple',
+            'PypiMirror': 'https://mirrors.aliyun.com/pypi/simple',
             'Language': 'zh-CN',
         }
         aidlux = {
@@ -527,33 +588,38 @@ class ConfigUpdater:
         # ('SupplyPack.SupplyPack.WeeklyFreeSupplyPack', 'Freebies.SupplyPack.Collect'),
         # ('Commission.Commission.CommissionFilter', 'Commission.Commission.CustomFilter'),
         # 2023.02.17
-        ('OpsiAshBeacon.OpsiDossierBeacon.Enable', 'OpsiAshBeacon.OpsiAshBeacon.AttackMode', dossier_redirect),
-        ('General.Retirement.EnhanceFavourite', 'General.Enhance.ShipToEnhance', enhance_favourite_redirect),
-        ('General.Retirement.EnhanceFilter', 'General.Enhance.Filter'),
-        ('General.Retirement.EnhanceCheckPerCategory', 'General.Enhance.CheckPerCategory', enhance_check_redirect),
-        ('General.Retirement.OldRetireN', 'General.OldRetire.N'),
-        ('General.Retirement.OldRetireR', 'General.OldRetire.R'),
-        ('General.Retirement.OldRetireSR', 'General.OldRetire.SR'),
-        ('General.Retirement.OldRetireSSR', 'General.OldRetire.SSR'),
-        (('GemsFarming.GemsFarming.FlagshipChange', 'GemsFarming.GemsFarming.FlagshipEquipChange'),
-         'GemsFarming.GemsFarming.ChangeFlagship',
-         change_ship_redirect),
-        (('GemsFarming.GemsFarming.VanguardChange', 'GemsFarming.GemsFarming.VanguardEquipChange'),
-         'GemsFarming.GemsFarming.ChangeVanguard',
-         change_ship_redirect),
-        ('Alas.DropRecord.API', 'Alas.DropRecord.API', api_redirect2)
+        # ('OpsiAshBeacon.OpsiDossierBeacon.Enable', 'OpsiAshBeacon.OpsiAshBeacon.AttackMode', dossier_redirect),
+        # ('General.Retirement.EnhanceFavourite', 'General.Enhance.ShipToEnhance', enhance_favourite_redirect),
+        # ('General.Retirement.EnhanceFilter', 'General.Enhance.Filter'),
+        # ('General.Retirement.EnhanceCheckPerCategory', 'General.Enhance.CheckPerCategory', enhance_check_redirect),
+        # ('General.Retirement.OldRetireN', 'General.OldRetire.N'),
+        # ('General.Retirement.OldRetireR', 'General.OldRetire.R'),
+        # ('General.Retirement.OldRetireSR', 'General.OldRetire.SR'),
+        # ('General.Retirement.OldRetireSSR', 'General.OldRetire.SSR'),
+        # (('GemsFarming.GemsFarming.FlagshipChange', 'GemsFarming.GemsFarming.FlagshipEquipChange'),
+        #  'GemsFarming.GemsFarming.ChangeFlagship',
+        #  change_ship_redirect),
+        # (('GemsFarming.GemsFarming.VanguardChange', 'GemsFarming.GemsFarming.VanguardEquipChange'),
+        #  'GemsFarming.GemsFarming.ChangeVanguard',
+        #  change_ship_redirect),
+        # ('Alas.DropRecord.API', 'Alas.DropRecord.API', api_redirect2)
+        # 2025.04.17
+        # ('Coalition.Coalition.Mode', 'Coalition.Coalition.Mode', coalition_to_frostfall),
+        # 2025.06.26
+        # ('Coalition.Coalition.Mode', 'Coalition.Coalition.Mode', coalition_to_little_academy),
     ]
-    redirection += [
-        (
-            (f'{task}.Emotion.CalculateEmotion', f'{task}.Emotion.IgnoreLowEmotionWarn'),
-            f'{task}.Emotion.Mode',
-            emotion_mode_redirect
-        ) for task in [
-            'Main', 'Main2', 'Main3', 'GemsFarming',
-            'Event', 'Event2', 'EventA', 'EventB', 'EventC', 'EventD', 'EventSp', 'Raid', 'RaidDaily',
-            'Sos', 'WarArchives',
-        ]
-    ]
+
+    # redirection += [
+    #     (
+    #         (f'{task}.Emotion.CalculateEmotion', f'{task}.Emotion.IgnoreLowEmotionWarn'),
+    #         f'{task}.Emotion.Mode',
+    #         emotion_mode_redirect
+    #     ) for task in [
+    #         'Main', 'Main2', 'Main3', 'GemsFarming',
+    #         'Event', 'Event2', 'EventA', 'EventB', 'EventC', 'EventD', 'EventSp', 'Raid', 'RaidDaily',
+    #         'Sos', 'WarArchives',
+    #     ]
+    # ]
 
     @cached_property
     def args(self):
@@ -570,40 +636,44 @@ class ConfigUpdater:
         """
         new = {}
 
-        def deep_load(keys):
-            data = deep_get(self.args, keys=keys, default={})
+        for keys, data in deep_iter(self.args, depth=3):
             value = deep_get(old, keys=keys, default=data['value'])
-            if is_template or value is None or value == '' or data['type'] == 'lock' or data.get('display') == 'hide':
+            typ = data['type']
+            display = data.get('display')
+            if is_template or value is None or value == '' \
+                    or typ in ['lock', 'state'] or (display == 'hide' and typ != 'stored'):
                 value = data['value']
             value = parse_value(value, data=data)
             deep_set(new, keys=keys, value=value)
-
-        for path, _ in deep_iter(self.args, depth=3):
-            deep_load(path)
 
         # AzurStatsID
         if is_template:
             deep_set(new, 'Alas.DropRecord.AzurStatsID', None)
         else:
             deep_default(new, 'Alas.DropRecord.AzurStatsID', random_id())
+        if deep_get(new, keys='OpsiHazard1Leveling.Scheduler.Enable'):
+            deep_set(new, keys='OpsiMeowfficerFarming.Scheduler.Enable', value=True)
         # Update to latest event
         server = to_server(deep_get(new, 'Alas.Emulator.PackageName', 'cn'))
         if not is_template:
             for task in EVENTS + RAIDS + COALITIONS:
-                deep_set(new,
-                         keys=f'{task}.Campaign.Event',
-                         value=deep_get(self.args, f'{task}.Campaign.Event.{server}'))
+                opts = deep_get(self.args, keys=f'{task}.Campaign.Event.option_{server}', default=[])
+                if not deep_get(new, keys=f'{task}.Campaign.Event', default='campaign_main') in opts:
+                    deep_set(new,
+                             keys=f'{task}.Campaign.Event',
+                             value=opts[0])
+
             for task in ['GemsFarming']:
                 if deep_get(new, keys=f'{task}.Campaign.Event', default='campaign_main') != 'campaign_main':
                     deep_set(new,
                              keys=f'{task}.Campaign.Event',
-                             value=deep_get(self.args, f'{task}.Campaign.Event.{server}'))
+                             value=deep_get(self.args, f'{task}.Campaign.Event.option_{server}')[0])
         # War archive does not allow campaign_main
         for task in WAR_ARCHIVES:
             if deep_get(new, keys=f'{task}.Campaign.Event', default='campaign_main') == 'campaign_main':
                 deep_set(new,
                          keys=f'{task}.Campaign.Event',
-                         value=deep_get(self.args, f'{task}.Campaign.Event.{server}'))
+                         value=deep_get(self.args, f'{task}.Campaign.Event.option_{server}')[0])
 
         # Events does not allow default stage 12-4
         def default_stage(t, stage):
@@ -613,7 +683,7 @@ class ConfigUpdater:
         for task in EVENTS + WAR_ARCHIVES:
             default_stage(task, 'D3')
         for task in COALITIONS:
-            default_stage(task, 'TC-3')
+            default_stage(task, 'area1-normal')
 
         if not is_template:
             new = self.config_redirect(old, new)
@@ -688,6 +758,26 @@ class ConfigUpdater:
                 remove_drop_save(arg)
 
         return data
+
+    def save_callback(self, key: str, value: t.Any) -> t.Iterable[t.Tuple[str, t.Any]]:
+        """
+        Args:
+            key: Key path in config json, such as "Main.Emotion.Fleet1Value"
+            value: Value set by user, such as "98"
+
+        Yields:
+            str: Key path to set config json, such as "Main.Emotion.Fleet1Record"
+            any: Value to set, such as "2020-01-01 00:00:00"
+        """
+        if "Emotion" in key and "Value" in key:
+            key = key.split(".")
+            key[-1] = key[-1].replace("Value", "Record")
+            yield ".".join(key), datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # Oh no, dynamic dropdown update can only be used on pywebio > 1.8.0
+        # elif key == 'Alas.Emulator.ScreenshotMethod' and value == 'nemu_ipc':
+        #     yield 'Alas.Emulator.ControlMethod', 'nemu_ipc'
+        # elif key == 'Alas.Emulator.ControlMethod' and value == 'nemu_ipc':
+        #     yield 'Alas.Emulator.ScreenshotMethod', 'nemu_ipc'
 
     def read_file(self, config_name, is_template=False):
         """

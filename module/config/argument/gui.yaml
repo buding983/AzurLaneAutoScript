@@ -14,8 +14,12 @@ Button:
   Stop:
   ScrollON:
   ScrollOFF:
+  DashboardON:
+  DashboardOFF:
   ClearLog:
   Setting:
+  Enable:
+  Disable:
   CheckUpdate:
   ClickToUpdate:
   RetryUpdate:
@@ -46,11 +50,32 @@ MenuDevelop:
 
 Overview:
   Scheduler:
+  Dashboard:
+  SecondsAgo:
+  MinutesAgo:
+  HoursAgo:
+  DaysAgo:
+  MonthsAgo:
+  YearsAgo:
+  NoData:
+  Oil:
+  Coin:
+  Gem:
+  Cube:
+  Pt:
+  YellowCoin:
+  PurpleCoin:
+  ActionPoint:
+  Merit:
+  Medal:
+  Core:
+  GuildCoin:
   Log:
   Running:
   Pending:
   Waiting:
   NoTask:
+  Recent:
 
 AddAlas:
   PopupTitle:
