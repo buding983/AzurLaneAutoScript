@@ -225,9 +225,12 @@ class CampaignRun(CampaignEvent, ShopStatus):
             'event_20251023_cn',
             'event_20260326_cn',
             'event_20260625_cn',
+            'event_20261022_cn',
             'war_archives_20230525_cn',
             'war_archives_20231026_cn',
             'war_archives_20240725_cn',
+            'war_archives_20241024_cn',
+            'war_archives_20251023_cn',
         ]:
             name = convert.get(name, name)
         # Convert between A/B/C/D and T/HT
@@ -264,9 +267,12 @@ class CampaignRun(CampaignEvent, ShopStatus):
             'event_20251023_cn',
             'event_20260326_cn',
             'event_20260625_cn',
+            'event_20261022_cn',
             'war_archives_20230525_cn',
             'war_archives_20231026_cn',
             'war_archives_20240725_cn',
+            'war_archives_20241024_cn',
+            'war_archives_20251023_cn',
         ]:
             name = convert.get(name, name)
         else:
@@ -391,6 +397,7 @@ class CampaignRun(CampaignEvent, ShopStatus):
 
             # Log
             logger.hr(name, level=1)
+            logger.info(f'Campaign run: event="{folder}", name={name}')
             if self.config.StopCondition_RunCount > 0:
                 logger.info(f'Count remain: {self.config.StopCondition_RunCount}')
             else:
