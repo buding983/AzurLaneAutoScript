@@ -1,16 +1,102 @@
 """Screenshot golden results; awaiting human review of collection/ images."""
+import pytest
+
 from module.testing.screenshot import image
 
-from module.island_handler.dock import IslandDock
-from module.island_handler.dock_scanner import CharacterScanner
+from module.island_handler.dock import IslandDock, dock_character_matches
+
+
+class TestDockGrid:
+    @image('island/dock/a4f3aae4', server='cn')
+    def test_full_bottom_rows(self, main: IslandDock):
+        grid = main.dock_grid
+        actual = dict(origin=tuple(grid.origin), shape=tuple(grid.grid_shape),
+                      bottom=main.island_dock_at_bottom(), third_row=main.island_dock_has_third_row())
+        main.device.review(actual, [(button.area, button.name) for button in grid.buttons])
+        assert actual == dict(origin=(56, 206), shape=(6, 2), bottom=True, third_row=False)
+
+    @image('island/dock/7fa4c81a', server='jp')
+    def test_bottom_with_partial_last_row(self, main: IslandDock):
+        grid = main.dock_grid
+        actual = dict(origin=tuple(grid.origin), shape=tuple(grid.grid_shape),
+                      bottom=main.island_dock_at_bottom(), third_row=main.island_dock_has_third_row())
+        main.device.review(actual, [(button.area, button.name) for button in grid.buttons])
+        assert actual == dict(origin=(56, 206), shape=(6, 2), bottom=True, third_row=False)
+
+    @image('island/dock/65c571e2', server='en')
+    def test_bottom_with_only_a_green_anchor_on_the_last_row(self, main: IslandDock):
+        grid = main.dock_grid
+        actual = dict(origin=tuple(grid.origin), shape=tuple(grid.grid_shape),
+                      bottom=main.island_dock_at_bottom(), third_row=main.island_dock_has_third_row())
+        main.device.review(actual, [(button.area, button.name) for button in grid.buttons])
+        assert actual == dict(origin=(56, 206), shape=(6, 2), bottom=True, third_row=False)
+
+    @image('island/dock/f9bd49a5', server='jp')
+    def test_top_has_a_clipped_third_row(self, main: IslandDock):
+        grid = main.dock_grid
+        actual = dict(origin=tuple(grid.origin), shape=tuple(grid.grid_shape),
+                      bottom=main.island_dock_at_bottom(), third_row=main.island_dock_has_third_row())
+        main.device.review(actual, [(button.area, button.name) for button in grid.buttons])
+        assert actual == dict(origin=(56, 139), shape=(6, 2), bottom=False, third_row=True)
+
+
+class TestCharactersEN:
+    @image('island/dock/65c571e2', server='en')
+    def test_selected_character_on_a_partial_bottom_row(self, main: IslandDock):
+        characters = main.island_dock_scan_page()
+        actual = [dict(identity=character.identity, emotion=character.emotion,
+                       emotion_limit=character.emotion_limit, grade=character.grade,
+                       status=character.status,
+                       selected=main.is_button_selected(character.button, color=(19, 181, 231)))
+                  for character in characters]
+        regions = [(character.button.area, str(entry)) for character, entry in zip(characters, actual)]
+        main.device.review(actual, regions)
+        assert actual == [
+            dict(identity='Belfast', emotion=120, emotion_limit=120, grade='C', status='occupied', selected=False),
+            dict(identity='Shimakaze', emotion=150, emotion_limit=150, grade='C', status='occupied', selected=False),
+            dict(identity='Le_Malin', emotion=150, emotion_limit=150, grade='C', status='free', selected=False),
+            dict(identity='New_Jersey', emotion=150, emotion_limit=150, grade='B', status='occupied', selected=False),
+            dict(identity='Akashi', emotion=120, emotion_limit=120, grade='B', status='occupied', selected=False),
+            dict(identity='Ying_Swei', emotion=150, emotion_limit=150, grade='B', status='free', selected=False),
+            dict(identity='Saratoga', emotion=150, emotion_limit=150, grade='B', status='free', selected=True),
+        ]
+
+
+@pytest.mark.parametrize('disabled', [('identity', 'grade'), ('identity', 'emotion_limit', 'grade')])
+class TestShortDocksTW:
+    @staticmethod
+    def check_short_search(main, monkeypatch, disabled):
+        monkeypatch.setattr(main, 'island_dock_sort_method_dsc_set', lambda **kwargs: None)
+
+        def next_page(**kwargs):
+            pytest.fail('Swiped past a short dock with an empty final slot')
+
+        monkeypatch.setattr(main, 'next_dock_page', next_page)
+        pages = []
+        result, completed = main.island_dock_search(lambda page: pages.append(page), disabled=disabled)
+        grid = main.dock_grid
+        actual = dict(origin=tuple(grid.origin), shape=tuple(grid.grid_shape),
+                      third_row=main.island_dock_has_third_row(),
+                      scanned_slots=[len(page) for page in pages], completed=completed)
+        main.device.review(actual, [(button.area, button.name) for button in grid.buttons])
+        assert actual == dict(origin=(56, 139), shape=(6, 2), third_row=False,
+                              scanned_slots=[11], completed=True)
+        assert result is None
+        assert main.device.drags == []
+
+    @image('island/dock/9079daa2', server='tw')
+    def test_short_descending_list_stops_without_swiping(self, main: IslandDock, monkeypatch, disabled):
+        self.check_short_search(main, monkeypatch, disabled)
+
+    @image('island/dock/8e690ac0', server='tw')
+    def test_short_ascending_list_stops_without_swiping(self, main: IslandDock, monkeypatch, disabled):
+        self.check_short_search(main, monkeypatch, disabled)
 
 
 class TestCharactersJP:
     @image('island/dock/f9bd49a5', server='jp')
     def test_two_selected_characters(self, main: IslandDock):
-        grid = main.get_dock_grid()
-        characters = CharacterScanner(grid, identity=None, emotion=None, emotion_limit=None,
-                                      grade=None, status=None).scan(main.device.image)
+        characters = main.island_dock_scan_page()
         actual = dict(in_dock=main.is_in_island_dock(), characters=[dict(
             identity=character.identity, emotion=character.emotion, emotion_limit=character.emotion_limit,
             grade=character.grade, status=character.status, area=character.button.area,
@@ -149,9 +235,7 @@ class TestCharactersJP:
 
     @image('island/dock/5c2752bc', server='jp')
     def test_one_selected_character(self, main: IslandDock):
-        grid = main.get_dock_grid()
-        characters = CharacterScanner(grid, identity=None, emotion=None, emotion_limit=None,
-                                      grade=None, status=None).scan(main.device.image)
+        characters = main.island_dock_scan_page()
         actual = dict(in_dock=main.is_in_island_dock(), characters=[dict(
             identity=character.identity, emotion=character.emotion, emotion_limit=character.emotion_limit,
             grade=character.grade, status=character.status, area=character.button.area,
@@ -170,7 +254,7 @@ class TestCharactersJP:
                     'emotion': 999,
                     'emotion_limit': 999,
                     'grade': 'E',
-                    'identity': 'Manjuu',
+                    'identity': 'Workerjuu',
                     'selected': True,
                     'status': 'free',
                 },
@@ -289,12 +373,26 @@ class TestCharactersJP:
         }
 
 
+class TestEmotionOnlyJP:
+    @image('island/dock/5c2752bc', server='jp')
+    def test_without_identity_or_grade_recognition(self, main: IslandDock):
+        characters = main.island_dock_scan_page(disabled=('identity', 'emotion_limit', 'grade'))
+        assert len(characters) == 12
+        assert all(c.identity is None and c.emotion_limit is None and c.grade is None for c in characters)
+        candidates = [c for c in characters if dock_character_matches(c, emotion=(80, 150))]
+        areas = [c.button.area for c in candidates]
+        main.device.review(dict(areas=areas), [(c.button.area, f'emotion={c.emotion}') for c in candidates])
+        assert areas == [
+            (336, 139, 460, 303), (476, 139, 600, 303), (756, 139, 880, 303),
+            (56, 319, 180, 483), (196, 319, 320, 483), (336, 319, 460, 483),
+            (476, 319, 600, 483), (616, 319, 740, 483), (756, 319, 880, 483),
+        ]
+
+
 class TestCharactersCN:
     @image('island/dock/a4f3aae4', server='cn')
     def test_no_selected_characters(self, main: IslandDock):
-        grid = main.get_dock_grid()
-        characters = CharacterScanner(grid, identity=None, emotion=None, emotion_limit=None,
-                                      grade=None, status=None).scan(main.device.image)
+        characters = main.island_dock_scan_page()
         actual = dict(in_dock=main.is_in_island_dock(), characters=[dict(
             identity=character.identity, emotion=character.emotion, emotion_limit=character.emotion_limit,
             grade=character.grade, status=character.status, area=character.button.area,
@@ -423,7 +521,7 @@ class TestCharactersCN:
                     'emotion': 999,
                     'emotion_limit': 999,
                     'grade': 'E',
-                    'identity': 'Manjuu',
+                    'identity': 'Workerjuu',
                     'selected': False,
                     'status': 'free',
                 },
